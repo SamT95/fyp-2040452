@@ -68,8 +68,8 @@ class CustomPineconeVectorstore(Pinecone):
     """
     A custom class which inherits from Pinecone, a Langchain vectorstore class.
     This custom class is required to override the `custom_similarity_search_by_vector_with_score` method of the parent class.
-    This is necessary because the index.query() method utilised in this function requires positional arguments,
-    and the Langchain vectorstore class does not support this yet.
+    This is necessary because the index.query() method utilised in this function requires keyword arguments,
+    and the Langchain vectorstore class uses positional arguments by default.
     """
 
     def custom_similarity_search_by_vector_with_score(self, embedding: List[float], *, k: int = 2, filter: Optional[dict] = None, namespace: Optional[str] = None) -> List[Tuple[Document, float]]:
@@ -77,8 +77,8 @@ class CustomPineconeVectorstore(Pinecone):
         if namespace is None:
             namespace = self._namespace
         docs = []
-        # Embedding requires positional argument (i.e. `vector=embedding`, not just `embedding`)
-        # If run without using positional arguments, an error is raised, hence the need for this custom function override.
+        # Embedding requires keyword arguments (i.e. `vector=embedding`, not just `embedding`)
+        # If run without using keyword arguments, an error is raised, hence the need for this custom function override.
         results = self._index.query(
             vector=embedding,
             top_k=k,
