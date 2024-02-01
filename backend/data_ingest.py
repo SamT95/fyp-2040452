@@ -70,3 +70,5 @@ def store_embeddings(chunks, embeddings):
         index_end = min(i + batch_size, len(data_to_upsert))
         batch = data_to_upsert[i:index_end]
         pinecone_index.upsert(items=batch)
+
+    print(f"Upserted {len(data_to_upsert)} items to index {index_name}.\n {pinecone_index.describe_index_stats()}")
