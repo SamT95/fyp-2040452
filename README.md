@@ -2,6 +2,15 @@
 
 This repository stores the code utilised in my final year project. This is a monorepo containing both backend and frontend code.
 
+## Table of Contents
+- [Frontend](#frontend)
+- [Backend](#backend)
+    - [Libraries Utilised](#libraries-utilised)
+    - [Data Ingestion](#data-ingestion)
+    - [Creating and Storing Embeddings](#creating-and-storing-embeddings)
+    - [Context Retrieval and Reranking](#context-retrieval-and-reranking)
+    - [Model Selection](#model-selection)
+
 ## Frontend
 The `frontend/` folder contains the source code of the frontend utilised in the project. The frontend was created using [Next.js](https://nextjs.org/) and [React](https://react.dev/).
 
@@ -18,10 +27,10 @@ Below is a list of the Python libraries utilised in the backend and the justific
 ### Data Ingestion
 WIP
 
-## Creating and Storing Embeddings
+### Creating and Storing Embeddings
 WIP
 
-### Context retrieval and reranking
+### Context Retrieval and Reranking
 WIP
 
 ### Model Selection
