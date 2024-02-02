@@ -3,6 +3,7 @@ from langchain.llms.sagemaker_endpoint import LLMContentHandler
 from langchain_community.llms import SagemakerEndpoint
 from typing import Dict
 import boto3
+import os
 import json
 
 def deploy_language_model(role):
