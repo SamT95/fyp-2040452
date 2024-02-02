@@ -5,6 +5,7 @@ import cohere
 import boto3
 import json
 from dotenv import load_dotenv
+from botocore.exceptions import ClientError
 from langchain_community.embeddings import CohereEmbeddings
 from typing import List
 
