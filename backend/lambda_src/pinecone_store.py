@@ -2,14 +2,15 @@
 # Pinecone serverless is being utilised since it requires no configuration of compute or storage resources.
 # Serverless indexes scale automatically based on usage. See https://www.pinecone.io/product/
 
+import os
+import json
+import boto3
+from botocore.exceptions import ClientError
 from dotenv import load_dotenv
 from pinecone import Pinecone as PineconeClient, ServerlessSpec
 from langchain_community.vectorstores import Pinecone
 from typing import List, Tuple, Optional
 from langchain.docstore.document import Document
-import os
-import json
-import boto3
 
 def fetch_pinecone_key():
     """
