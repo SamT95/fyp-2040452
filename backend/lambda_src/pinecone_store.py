@@ -3,11 +3,13 @@
 # Serverless indexes scale automatically based on usage. See https://www.pinecone.io/product/
 
 from dotenv import load_dotenv
-import os
 from pinecone import Pinecone as PineconeClient, ServerlessSpec
-from langchain.vectorstores import Pinecone
+from langchain_community.vectorstores import Pinecone
 from typing import List, Tuple, Optional
 from langchain.docstore.document import Document
+import os
+import json
+import boto3
 
 def fetch_pinecone_key():
     """
@@ -32,7 +34,10 @@ def fetch_pinecone_key():
         raise e
 
     secret = get_secret_value_response['SecretString']
-    return secret
+    secret = json.loads(secret)
+    # Extract PINECONE_API_KEY key from json object
+    key = secret["PINECONE_API_KEY"]
+    return key
 
 def create_pinecone_index(index_name: str, shape: int):
     """
