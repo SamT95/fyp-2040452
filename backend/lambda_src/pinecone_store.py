@@ -2,20 +2,43 @@
 # Pinecone serverless is being utilised since it requires no configuration of compute or storage resources.
 # Serverless indexes scale automatically based on usage. See https://www.pinecone.io/product/
 
-from dotenv import load_dotenv
 import os
+import json
+import boto3
+from botocore.exceptions import ClientError
+from dotenv import load_dotenv
 from pinecone import Pinecone as PineconeClient, ServerlessSpec
-from langchain.vectorstores import Pinecone
+from langchain_community.vectorstores import Pinecone
 from typing import List, Tuple, Optional
 from langchain.docstore.document import Document
 
 def fetch_pinecone_key():
     """
-    This function fetches the Pinecone API key from the environment variables.
+    This function fetches the Pinecone API key from AWS Secrets Manager.
     """
 
-    load_dotenv()
-    return os.getenv("PINECONE_API_KEY")
+    secret_name = "rag/PineconeKey"
+    region_name = "eu-west-1"
+
+    # Create a Secrets Manager client
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name=region_name
+    )
+
+    try:
+        get_secret_value_response = client.get_secret_value(
+            SecretId=secret_name
+        )
+    except ClientError as e:
+        raise e
+
+    secret = get_secret_value_response['SecretString']
+    secret = json.loads(secret)
+    # Extract PINECONE_API_KEY key from json object
+    key = secret["PINECONE_API_KEY"]
+    return key
 
 def create_pinecone_index(index_name: str, shape: int):
     """

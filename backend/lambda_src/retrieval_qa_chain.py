@@ -68,6 +68,8 @@ def create_qa_chain():
         chain_type_kwargs={"prompt": prompt},
     )
 
+    return chain
+
     # The following code can be used to test the chain, however the chain object will be returned and used elsewhere.
     
     # query = "What is the purpose of security awareness?"

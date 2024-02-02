@@ -2,17 +2,40 @@
 
 import os
 import cohere
+import boto3
+import json
 from dotenv import load_dotenv
-from langchain.embeddings import CohereEmbeddings
+from botocore.exceptions import ClientError
+from langchain_community.embeddings import CohereEmbeddings
 from typing import List
 
 def fetch_cohere_key():
     """
-    This function fetches the Cohere API key from the environment variables.
+    This function fetches the Cohere API key from AWS Secrets Manager.
     """
 
-    load_dotenv()
-    return os.getenv("COHERE_API_KEY")
+    secret_name = "rag/CohereKeyProd"
+    region_name = "eu-west-1"
+
+    # Create a Secrets Manager client
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name=region_name
+    )
+
+    try:
+        get_secret_value_response = client.get_secret_value(
+            SecretId=secret_name
+        )
+    except ClientError as e:
+        raise e
+
+    secret = get_secret_value_response['SecretString']
+    secret = json.loads(secret)
+    # Extract COHERE_API_KEY key from json object
+    key = secret["COHERE_API_KEY"]
+    return key
 
 def batch_embeddings(chunks, batch_size=10):
     """

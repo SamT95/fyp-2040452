@@ -3,7 +3,6 @@ import os
 import aws_cdk as cdk
 from infra.infra_stack import InfraStack
 from dotenv import load_dotenv
-from infra.lambda_stack import LambdaStack
 
 load_dotenv()
 
@@ -11,7 +10,7 @@ cdk_env = cdk.Environment(account=os.getenv('CDK_DEFAULT_ACCOUNT'), region=os.ge
 
 
 app = cdk.App()
-InfraStack(app, "InfraStack",
+InfraStack(app, "InfraStack", env=cdk_env
     # If you don't specify 'env', this stack will be environment-agnostic.
     # Account/Region-dependent features and context lookups will not work,
     # but a single synthesized template can be deployed anywhere.
@@ -29,6 +28,5 @@ InfraStack(app, "InfraStack",
     # For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html
     )
 
-LambdaStack(app, "LambdaStack", env=cdk_env)
 
 app.synth()

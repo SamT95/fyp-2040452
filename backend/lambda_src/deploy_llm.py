@@ -1,8 +1,9 @@
 from sagemaker.huggingface import HuggingFaceModel, get_huggingface_llm_image_uri
 from langchain.llms.sagemaker_endpoint import LLMContentHandler
-from langchain.llms import SagemakerEndpoint
+from langchain_community.llms import SagemakerEndpoint
 from typing import Dict
 import boto3
+import os
 import json
 
 def deploy_language_model(role):
@@ -67,7 +68,7 @@ def build_sagemaker_llm_endpoint(role):
     # If the LLM is not already deployed, uncomment the following line:
     # llm_endpoint_name = deploy_language_model(role)
     # Will be updated to automatically check if it is deployed (i.e. checking if it exists in env or another method)
-    llm_endpoint_name = os.environ.get("LLM_ENDPOINT_NAME")
+    llm_endpoint_name = os.environ.get("LLM_ENDPOINT_NAME", "huggingface-pytorch-tgi-inference-2024-02-01-21-03-44-785")
     sagemaker_runtime = boto3.client("sagemaker-runtime")
     content_handler = ContentHandler()
     llm = SagemakerEndpoint(
@@ -78,3 +79,6 @@ def build_sagemaker_llm_endpoint(role):
     )
 
     return llm
+
+
+# deploy_language_model('arn:aws:iam::349382198749:role/SagemakerExecutionRoleCustom')
