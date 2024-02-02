@@ -2,6 +2,8 @@
 
 import os
 import cohere
+import boto3
+import json
 from dotenv import load_dotenv
 from langchain_community.embeddings import CohereEmbeddings
 from typing import List
@@ -29,7 +31,10 @@ def fetch_cohere_key():
         raise e
 
     secret = get_secret_value_response['SecretString']
-    return secret
+    secret = json.loads(secret)
+    # Extract COHERE_API_KEY key from json object
+    key = secret["COHERE_API_KEY"]
+    return key
 
 def batch_embeddings(chunks, batch_size=10):
     """
