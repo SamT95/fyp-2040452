@@ -1,0 +1,42 @@
+name: Build and Deploy Lambda Layer
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/rag/requirements.txt'
+      # Trigger workflow when requirements.txt file is updated
+
+jobs:
+  build-layer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build Docker Image
+        run: docker build -t lambda-layer -f backend/Dockerfile backend/rag/
+
+      - name: Create Docker Container
+        run: docker create --name lambda-layer-container lambda-layer
+
+      - name: Copy Dependencies From Container
+        run: docker cp lambda-layer-container:/var/task/python ./python
+
+      - name: Zip Dependencies
+        run: zip -r layer.zip ./python
+
+      # Configure AWS Credentials
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+
+      - name: Upload Layer to S3
+        run: aws s3 cp layer.zip s3://rag-lambda-deployment-package/layer.zip
+
+      # Cleanup
+      - name: Remove Docker Container
+        run: docker rm lambda-layer-container
