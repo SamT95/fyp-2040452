@@ -52,15 +52,3 @@ class CybokScraper(BaseScraper):
             text = self.extract_pdf_text(link)
             pdf_text.append(text)
         return pdf_text
-
-def main():
-    cybok_scraper = CybokScraper()
-    pdf_links = cybok_scraper.collect_pdf_links()
-    pdf_text = []
-    for link in pdf_links:
-        text = cybok_scraper.extract_pdf_text(link)
-        pdf_text.append(text)
-    print(pdf_text[1])
-
-if __name__ == "__main__":
-    main()
