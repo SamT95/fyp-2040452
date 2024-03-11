@@ -2,10 +2,10 @@
 # Ensures compatibility between local deployment package and lambda runtime
 FROM public.ecr.aws/lambda/python:3.10
 
-WORKDIR /lamnda_dependencies
+WORKDIR /lambda_dependencies
 
 # Copy requirements.txt for files to be deployed on Lambda
-COPY backend/rag/requirements.txt .
+COPY requirements.txt .
 
 # Install the function's dependencies using requirements.txt
 # The --target option specifies the directory to store the installed packages,
