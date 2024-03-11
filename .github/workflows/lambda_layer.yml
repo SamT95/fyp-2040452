@@ -39,6 +39,18 @@ jobs:
       - name: Upload Layer to S3
         run: aws s3 cp layer.zip s3://rag-lambda-deployment-package/layer.zip
 
+      - name: Publish Lambda Layer
+        run: |
+          aws lambda publish-layer-version \
+            --layer-name rag-layer \
+            --description "RAG Lambda Layer" \
+            --content S3Bucket=rag-lambda-deployment-package,S3Key=layer.zip \
+            --compatible-runtimes python3.10
+    
+      - name: Store Layer ARN in Secrets Manager
+        run: |
+          aws secretsmanager create-secret --name rag-layer-arn --secret-string $(aws lambda list-layer-versions --layer-name rag-layer --query 'LayerVersions[0].LayerVersionArn' --output text)
+
       # Cleanup
       - name: Remove Docker Container
         run: docker rm lambda-layer-container
