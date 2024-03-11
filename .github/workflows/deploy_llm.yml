@@ -1,0 +1,31 @@
+name: Deploy LLM to SageMaker
+
+on:
+  workflow_dispatch:
+  # Additional triggers as needed
+
+jobs:
+  deploy-llm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: |
+          pip install boto3 sagemaker
+      - name: Deploy LLM to SageMaker
+        id: deploy_llm
+        run: |
+          endpoint_name=$(python backend/deployment/deploy_llm.py)
+          echo "ENDPOINT_NAME=$endpoint_name" >> $GITHUB_ENV
+      - name: Store Endpoint Name
+        run: |
+          # Write endpoint name to AWS Systems Manager Parameter Store
+          aws ssm put-parameter --name "rag/LLMEndpointName" --value ${{ env.ENDPOINT_NAME }} --type String --overwrite
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: 'eu-west-2'
