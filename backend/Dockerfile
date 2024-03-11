@@ -2,18 +2,12 @@
 # Ensures compatibility between local deployment package and lambda runtime
 FROM public.ecr.aws/lambda/python:3.10
 
-WORKDIR /deployment
+WORKDIR /lamnda_dependencies
 
-# Copy python source files into container
-COPY lambda_src/ ./
+# Copy requirements.txt for files to be deployed on Lambda
+COPY rag/requirements.txt .
 
-COPY requirements.txt .
-
-# Update package list and install zip
-RUN yum install -y zip
-
-# Install the function's dependencies using  requirements.txt
-RUN python -m pip install -r requirements.txt --target .
-
-# Zip the contents of the current directory (.) into a deployment package (/var/task/lambda-package.zip)
-RUN zip -r9 lambda-package.zip .
+# Install the function's dependencies using requirements.txt
+# The --target option specifies the directory to store the installed packages,
+# which is set to the Python packages directory used by AWS Lambda.
+RUN python -m pip install -r requirements.txt --target /var/task/python
