@@ -5,7 +5,7 @@ FROM public.ecr.aws/lambda/python:3.10
 WORKDIR /lamnda_dependencies
 
 # Copy requirements.txt for files to be deployed on Lambda
-COPY rag/requirements.txt .
+COPY backend/rag/requirements.txt .
 
 # Install the function's dependencies using requirements.txt
 # The --target option specifies the directory to store the installed packages,
