@@ -1,5 +1,6 @@
 from sagemaker.huggingface import HuggingFaceModel, get_huggingface_llm_image_uri
 import json
+import sys # For sys.stdout during GitHub Actions
 
 def deploy_language_model(role):
     # Hub Model configuration. https://huggingface.co/models
@@ -24,5 +25,10 @@ def deploy_language_model(role):
       )
     
     endpoint_name = predictor.endpoint_name
-    print(f'Language model deployed. Endpoint {endpoint_name}')
-    return endpoint_name
+    print(endpoint_name, file=sys.stdout)
+
+# Add ability to execute as script in GitHub Actions
+if __name__ == "__main__":
+    import os
+    role = os.environ.get("SAGEMAKER_EXECUTION_ROLE")
+    endpoint_name = deploy_language_model(role)
