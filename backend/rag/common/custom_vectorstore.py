@@ -1,7 +1,7 @@
 from langchain_community.vectorstores import Pinecone
 from typing import List, Tuple, Optional
 from langchain.docstore.document import Document
-from fetch_keys import fetch_pinecone_key
+from .fetch_keys import fetch_pinecone_key
 from pinecone import Pinecone as PineconeClient
 
 class CustomPineconeVectorstore(Pinecone):
