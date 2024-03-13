@@ -26,35 +26,7 @@ class ContentHandler(LLMContentHandler):
         response_json = json.loads(output.read().decode('utf-8'))
         answer_split = response_json[0]['generated_text'].split('[/INST] ')
         return answer_split[1]
-    
 
-def fetch_endpoint_name():
-    """
-    This function fetches the endpoint name from AWS Secrets Manager.
-    """
-
-    secret_name = "rag/LLMEndpointName"
-    region_name = "eu-west-1"
-
-    # Create a Secrets Manager client
-    session = boto3.session.Session()
-    client = session.client(
-        service_name='secretsmanager',
-        region_name=region_name
-    )
-
-    try:
-        get_secret_value_response = client.get_secret_value(
-            SecretId=secret_name
-        )
-    except ClientError as e:
-        raise e
-    
-    secret = get_secret_value_response['SecretString']
-    secret = json.loads(secret)
-    # Extract LLM_ENDPOINT_NAME key from json object
-    endpoint_name = secret["LLM_ENDPOINT_NAME"]
-    return endpoint_name
 
 def build_sagemaker_llm_endpoint(role):
     """
@@ -67,7 +39,7 @@ def build_sagemaker_llm_endpoint(role):
         "temperature": 0.1,
     }
 
-    llm_endpoint_name = fetch_endpoint_name()
+    llm_endpoint_name = "huggingface-rag-llm-endpoint"
     sagemaker_runtime = boto3.client("sagemaker-runtime")
     content_handler = ContentHandler()
     llm = SagemakerEndpoint(
