@@ -13,19 +13,24 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: '3.x'
+
       - name: Install dependencies
         run: |
           pip install boto3 sagemaker
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+
       - name: Deploy LLM to SageMaker
         id: deploy_llm
         run: |
           endpoint_name=$(python backend/deployment/deploy_llm.py)
           echo "ENDPOINT_NAME=$endpoint_name" >> $GITHUB_ENV
-      - name: Store Endpoint Name
+
+      - name: Store Endpoint Name in Secrets Manager
         run: |
-          # Write endpoint name to AWS Systems Manager Parameter Store
-          aws ssm put-parameter --name "rag/LLMEndpointName" --value ${{ env.ENDPOINT_NAME }} --type String --overwrite
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: 'eu-west-2'
+          aws secretsmanager create-secret --name "rag/LLMEndpointName" --secret-string $endpoint_name
