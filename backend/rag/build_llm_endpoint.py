@@ -47,7 +47,6 @@ def build_sagemaker_llm_endpoint(role):
         model_kwargs=model_kwargs,
         content_handler=content_handler,
         client=sagemaker_runtime,
-        streaming=True,
     )
 
     return llm
