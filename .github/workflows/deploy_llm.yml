@@ -29,6 +29,7 @@ jobs:
         id: deploy_llm
         run: |
           endpoint_name=$(python backend/deployment/deploy_llm.py)
+          echo "Script output: $endpoint_name"
           echo "ENDPOINT_NAME=$endpoint_name" >> $GITHUB_ENV
         env:
           SAGEMAKER_EXECUTION_ROLE: ${{ secrets.SAGEMAKER_EXECUTION_ROLE }}
