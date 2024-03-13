@@ -21,11 +21,14 @@ def deploy_language_model(role):
     	role=role, 
     )
 
+    endpoint_name="huggingface-rag-llm-endpoint"
+
     # deploy model to SageMaker Inference
     predictor = huggingface_model.deploy(
     	initial_instance_count=1,
     	instance_type="ml.g5.2xlarge",
     	container_startup_health_check_timeout=300,
+      endpoint_name=endpoint_name,
       )
     
     endpoint_name = predictor.endpoint_name
