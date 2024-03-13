@@ -1,6 +1,10 @@
 from sagemaker.huggingface import HuggingFaceModel, get_huggingface_llm_image_uri
 import json
 import sys # For sys.stdout during GitHub Actions
+import logging
+
+logging.getLogger("sagemaker").setLevel(logging.WARNING)
+# Silence 'INFO' logging from huggingface_model.deploy()
 
 def deploy_language_model(role):
     # Hub Model configuration. https://huggingface.co/models
