@@ -62,7 +62,7 @@ def create_qa_chain():
     text_field = "text"
     vectorstore = CustomPineconeVectorstore(pinecone_index, embeddings, text_field)
     prompt = create_prompt_template()
-    handler = StdOutCallbackHandler() # Initialise an output callback handler for streaming
+    # handler = StdOutCallbackHandler() # Initialise an output callback handler for streaming
 
 
     chain = RetrievalQA.from_chain_type(
@@ -70,7 +70,6 @@ def create_qa_chain():
         chain_type="stuff",
         retriever=vectorstore.as_retriever(search_kwargs={"k": 1}),
         chain_type_kwargs={"prompt": prompt},
-        callbacks=[handler],
         return_source_documents=True,
     )
 
