@@ -3,7 +3,8 @@ from aws_cdk import (
     aws_lambda as _lambda,
     aws_apigateway as apigw,
     aws_iam as iam,
-    aws_secretsmanager as secretsmanager
+    aws_secretsmanager as secretsmanager,
+    aws_lambda_python_alpha as _alambda
 )
 from constructs import Construct
 
@@ -23,16 +24,30 @@ class InfraStack(Stack):
         # )
 
         # Define the Lambda function
-        self.qa_chain_lambda = _lambda.Function(
-            self, "QueryChain",
+        # self.qa_chain_lambda = _lambda.Function(
+        #     self, 
+        #     "QueryChain",
+        #     runtime=_lambda.Runtime.PYTHON_3_10,
+        #     handler="lambda_handler.lambda_handler",  # File is `lambda_handler.py`, function is `lambda_handler`
+        #     # Code comes from zipped deployment package
+        #     code=_lambda.Code.from_asset("../backend/rag"), # Code for the RAG chain and lambda handler
+        #     environment={
+        #         "SAGEMAKER_EXECUTION_ROLE": "arn:aws:iam::349382198749:role/SagemakerExecutionRoleCustom"
+        #     },
+        #     # layers=[dependency_layer],
+        # )
+
+        # Temp: Use alpha python lambda function
+        # This will handle the inclusion of external dependencies by installing them in a
+        # lambda-compatible Docker container. See https://docs.aws.amazon.com/cdk/api/v2/docs/aws-lambda-python-alpha-readme.html
+
+        self.qa_chain_lambda = _alambda.PythonFunction(
+            self,
+            "QueryChain",
+            entry="../backend/rag",
+            index="lambda_handler.py",
+            handler="lambda_handler",
             runtime=_lambda.Runtime.PYTHON_3_10,
-            handler="lambda_handler.lambda_handler",  # File is `lambda_handler.py`, function is `lambda_handler`
-            # Code comes from zipped deployment package
-            code=_lambda.Code.from_asset("../backend/rag"), # Code for the RAG chain and lambda handler
-            environment={
-                "SAGEMAKER_EXECUTION_ROLE": "arn:aws:iam::349382198749:role/SagemakerExecutionRoleCustom"
-            },
-            # layers=[dependency_layer],
         )
 
         # Define policy statement to allow lambda to access secrets manager
