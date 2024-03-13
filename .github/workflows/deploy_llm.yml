@@ -28,12 +28,6 @@ jobs:
       - name: Deploy LLM to SageMaker
         id: deploy_llm
         run: |
-          endpoint_name=$(python backend/deployment/deploy_llm.py)
-          echo "Script output: $endpoint_name"
-          echo "ENDPOINT_NAME=$endpoint_name" >> $GITHUB_ENV
+          python backend/deployment/deploy_llm.py
         env:
           SAGEMAKER_EXECUTION_ROLE: ${{ secrets.SAGEMAKER_EXECUTION_ROLE }}
-
-      - name: Store Endpoint Name in Secrets Manager
-        run: |
-          aws secretsmanager create-secret --name "rag/LLMEndpointName" --secret-string $endpoint_name
