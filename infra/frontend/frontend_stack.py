@@ -37,6 +37,13 @@ class FrontendStack(Stack):
             memory_limit_mib=512
         )
 
+        # Add port mappings
+        task_definition.add_port_mappings(
+            ecs.PortMapping(
+                container_port=3000
+            )
+        )
+
         # Create Fargate service
         load_balanced_fargate_service = patterns.ApplicationLoadBalancedFargateService(
             self, "Service",
