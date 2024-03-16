@@ -1,4 +1,4 @@
-name: Deploy CDK Infrastructure
+name: Deploy Backend CDK Infrastructure
 
 on:
   push:
