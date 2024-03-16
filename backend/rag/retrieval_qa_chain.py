@@ -12,9 +12,12 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 from build_llm_endpoint import build_sagemaker_llm_endpoint
 import os
+import logging
 from dotenv import load_dotenv
 load_dotenv()
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def create_prompt_template():
     """
@@ -45,6 +48,10 @@ def create_prompt_template():
     return prompt
 
 def format_docs(docs):
+    for doc in docs:
+        logger.info(f"Doc: {doc}")
+        logger.info(f"Page content: {doc.page_content}")
+        logger.info(f"Metadata: {doc.metadata}")
     return "\n\n".join([f"{doc.page_content}" for doc in docs])
     
 def create_qa_chain():
