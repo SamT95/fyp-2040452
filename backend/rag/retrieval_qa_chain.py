@@ -57,7 +57,7 @@ def create_qa_chain():
     )
     sagemaker_execution_role = os.environ.get("SAGEMAKER_EXECUTION_ROLE")
     llm = build_sagemaker_llm_endpoint(sagemaker_execution_role)
-    index_name = "rag-test-cohere"
+    index_name = "rag-index"
     pinecone_index = load_existing_index(index_name)
     text_field = "text"
     vectorstore = CustomPineconeVectorstore(pinecone_index, embeddings, text_field)
