@@ -27,16 +27,23 @@ def lambda_handler(event, context):
     logger.info(f"Output: {output}")
 
 
-    result = output["result"]
-    source_documents = output["source_documents"]
-    logger.info(f"Result: {result}")
+    # result = output["result"]
+    # source_documents = output["source_documents"]
+    # logger.info(f"Result: {result}")
+    context = output["context"]
+    logger.info(f"Context: {context}")
+    answer = output["answer"]
+    logger.info(f"Answer: {answer}")
+
+    source_documents = [{"text": doc.page_content, "metadata": doc.metadata} for doc in context]
+    logger.info(f"Source documents: {source_documents}")
 
 
     # Return the QA chain response
     return {
         "statusCode": 200,
         "body": json.dumps({
-            "result": result,
+            "result": answer,
             "source_documents": source_documents
         }),
         "headers": {
