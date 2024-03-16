@@ -45,7 +45,7 @@ def create_prompt_template():
     return prompt
 
 def format_docs(docs):
-    return "\n\n".join([f"{doc.text}" for doc in docs])
+    return "\n\n".join([f"{doc.page_content}" for doc in docs])
     
 def create_qa_chain():
     """
