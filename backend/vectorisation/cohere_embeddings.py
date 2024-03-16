@@ -50,7 +50,7 @@ def batch_embeddings(chunks, batch_size=10):
     for i in range(0, len(chunks), batch_size):
         print(f"Processing batch {i // batch_size + 1} of {len(chunks) // batch_size + 1}")
         batch = chunks[i:i + batch_size]
-        batch_embeddings = co.embed(
+        batch_embeddings = cohere_client.embed(
             texts=batch,
             model="embed-english-v3.0",
             input_type="search_document",

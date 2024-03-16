@@ -35,3 +35,15 @@ WIP
 
 ### Model Selection
 WIP
+
+### Deployment
+
+#### Lambda Deployment Package
+The code in the `backend` folder has various functions, such as setting fetching and ingesting data, creating embeddings, deploying LLMs to SageMaker, and so on. While functions related to data ingestion and data embedding only need to run periodically, the functions that initialise and query the retrieval QA chain will need to run for each user query. 
+
+To enable this, AWS' serverless Lambda functions are utilised. The code in `backend/rag/lambda_handler.py` server as the entrypoint, or handler, of the lambda function. The handler accepts parameters in the form of an event and queries the chain with the supplied data. 
+
+To deploy the backend code, and to ensure that all dependencies utilised in the backend code are available, the [`aws_lambda_python_alpha`](https://docs.aws.amazon.com/cdk/api/v2/docs/aws-lambda-python-alpha-readme.html) library is used. This construct will handle installing all required modules (using a `requirements.txt` or other requirement file) in a Lambda-compatible Docker container.
+
+#### AWS CDK
+WIP
