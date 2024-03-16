@@ -11,7 +11,7 @@ cdk_env = cdk.Environment(account=os.getenv('CDK_DEFAULT_ACCOUNT'), region=os.ge
 
 
 app = cdk.App()
-BackendStack(app, "MyBackendStack", env=cdk_env
+BackendStack(app, "BackendStack", env=cdk_env
     # If you don't specify 'env', this stack will be environment-agnostic.
     # Account/Region-dependent features and context lookups will not work,
     # but a single synthesized template can be deployed anywhere.
@@ -28,6 +28,6 @@ BackendStack(app, "MyBackendStack", env=cdk_env
 
     # For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html
     )
-FrontendStack(app, "MyFrontendStack", env=cdk_env)
+FrontendStack(app, "FrontendStack", env=cdk_env)
 
 app.synth()
