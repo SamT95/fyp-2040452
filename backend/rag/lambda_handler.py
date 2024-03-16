@@ -14,7 +14,7 @@ chain = create_qa_chain()
 
 def lambda_handler(event, context):
     # Extract query from API Gateway event
-    logger.info("Event: %s", event)
+    logger.info(f"Event: {event}")
     try:
         query = json.loads(event["body"])["query"]
     except KeyError:
@@ -24,12 +24,12 @@ def lambda_handler(event, context):
         }
     # Initialize and run the QA chain
     output = chain.invoke(query)
-    logger.info("Output: %s", output)
+    logger.info(f"Output: {output}")
 
 
     result = output["result"]
     source_documents = output["source_documents"]
-    logger.info("Result: %s", result)
+    logger.info(f"Result: {result}")
 
 
     # Return the QA chain response
