@@ -34,14 +34,8 @@ class FrontendStack(Stack):
         task_definition.add_container(
             "FrontendContainer",
             image=ecs.ContainerImage.from_ecr_repository(ecr_repo),
-            memory_limit_mib=512
-        )
-
-        # Add port mappings
-        task_definition.add_port_mappings(
-            ecs.PortMapping(
-                container_port=3000
-            )
+            memory_limit_mib=512,
+            port_mappings=[ecs.PortMapping(container_port=3000)]
         )
 
         # Create Fargate service
