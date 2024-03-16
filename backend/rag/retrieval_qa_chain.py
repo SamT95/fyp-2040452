@@ -68,7 +68,7 @@ def create_qa_chain():
     # handler = StdOutCallbackHandler() # Initialise an output callback handler for streaming
 
     chain = (
-        {"content": vectorstore.as_retriever(search_kwargs={"k": 1}) | format_docs, "question": RunnablePassthrough()}
+        {"context": vectorstore.as_retriever(search_kwargs={"k": 1}) | format_docs, "question": RunnablePassthrough()}
         | prompt
         | llm
         | StrOutputParser()
