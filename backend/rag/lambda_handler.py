@@ -23,11 +23,12 @@ def lambda_handler(event, context):
             "body": json.dumps({"error": "Query parameter not found in request body"})
         }
     # Initialize and run the QA chain
-    output = chain({"query": query}, return_only_outputs=True)
+    output = chain.invoke(query)
+    logger.info("Output: %s", output)
+
 
     result = output["result"]
     source_documents = output["source_documents"]
-    logger.info("Output: %s", output)
     logger.info("Result: %s", result)
 
 
