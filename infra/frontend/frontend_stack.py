@@ -1,10 +1,9 @@
 from aws_cdk import (
     Stack,
-    aws_iam as iam,
-    aws_s3 as s3,
     aws_ecs as ecs,
     aws_ec2 as ec2,
     aws_ecs_patterns as patterns,
+    aws_ecr as ecr,
     CfnOutput,
 )
 from constructs import Construct
@@ -23,7 +22,7 @@ class FrontendStack(Stack):
         )
 
         # Connect to 'frontend' ECR repository
-        ecr_repo = ecs.Repository.from_repository_name(
+        ecr_repo = ecr.Repository.from_repository_name(
             self, "ECRRepo",
             repository_name="frontend"
         )
@@ -39,13 +38,17 @@ class FrontendStack(Stack):
         )
 
         # Create Fargate service
-        ecs_service = patterns.ApplicationLoadBalancedFargateService(
+        load_balanced_fargate_service = patterns.ApplicationLoadBalancedFargateService(
             self, "Service",
             cluster=ecs_cluster,
             task_definition=task_definition,
             public_load_balancer=True,
             desired_count=1
         )
+
+        # Output the load balancer address
+        self.lb_address = load_balanced_fargate_service.load_balancer.load_balancer_dns_name
+        CfnOutput(self, "LoadBalancerDNS", value=self.lb_address)
 
 
 
