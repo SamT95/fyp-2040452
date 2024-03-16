@@ -5,7 +5,8 @@ on:
     branches:
       - main
     paths:
-      - 'infra/**' # Run the workflow when changes are made to the infra directory
+      - 'backend/rag/**' # Run the workflow when changes are made to the backend/rag directory
+      # backend/rag contains the lambda handler code that is deployed to AWS.
   workflow_dispatch: 
   # Allows manual trigger
 
@@ -42,7 +43,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-1
 
-      - name: Deploy CDK Stack
+      - name: Deploy Backend CDK Stack
         run: |
-          cd infra
-          cdk deploy --require-approval never
+          cd infra/backend
+          cdk deploy BackendStack --require-approval never
