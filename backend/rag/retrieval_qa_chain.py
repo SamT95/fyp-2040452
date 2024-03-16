@@ -8,7 +8,7 @@ from langchain.prompts import PromptTemplate
 from common.custom_embeddings import CustomCohereEmbeddings
 from common.fetch_keys import fetch_cohere_key
 from common.custom_vectorstore import CustomPineconeVectorstore, load_existing_index
-from langchain_core.runnables import RunnablePassthrough
+from langchain_core.runnables import RunnablePassthrough, RunnableParallel
 from langchain_core.output_parsers import StrOutputParser
 from build_llm_endpoint import build_sagemaker_llm_endpoint
 import os
@@ -74,12 +74,22 @@ def create_qa_chain():
     prompt = create_prompt_template()
     # handler = StdOutCallbackHandler() # Initialise an output callback handler for streaming
 
-    chain = (
-        {"context": vectorstore.as_retriever(search_kwargs={"k": 1}) | format_docs, "question": RunnablePassthrough()}
+    chain_from_docs = (
+        RunnablePassthrough.assign(context=(lambda docs: format_docs(docs["context"])))
         | prompt
         | llm
         | StrOutputParser()
     )
+
+    chain_with_source = RunnableParallel(
+        {"context": vectorstore.as_retriever(search_kwargs={"k": 4}), "question": RunnablePassthrough()}
+    ).assign(answer=chain_from_docs)
+    # chain = (
+    #     {"context": vectorstore.as_retriever(search_kwargs={"k": 4}) | format_docs, "question": RunnablePassthrough()}
+    #     | prompt
+    #     | llm
+    #     | StrOutputParser()
+    # )
 
     # chain = RetrievalQA.from_chain_type(
     #     llm=llm,
@@ -89,7 +99,7 @@ def create_qa_chain():
     #     return_source_documents=True,
     # )
 
-    return chain
+    return chain_with_source
 
     # The following code can be used to test the chain, however the chain object will be returned and used elsewhere.
     
