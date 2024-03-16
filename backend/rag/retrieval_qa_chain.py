@@ -8,7 +8,8 @@ from langchain.prompts import PromptTemplate
 from common.custom_embeddings import CustomCohereEmbeddings
 from common.fetch_keys import fetch_cohere_key
 from common.custom_vectorstore import CustomPineconeVectorstore, load_existing_index
-from langchain.callbacks import StdOutCallbackHandler
+from langchain_core.runnables import RunnablePassthrough
+from langchain_core.output_parsers import StrOutputParser
 from build_llm_endpoint import build_sagemaker_llm_endpoint
 import os
 from dotenv import load_dotenv
@@ -43,6 +44,8 @@ def create_prompt_template():
 
     return prompt
 
+def format_docs(docs):
+    return "\n\n".join([f"{doc['text']}" for doc in docs])
     
 def create_qa_chain():
     """
@@ -64,14 +67,20 @@ def create_qa_chain():
     prompt = create_prompt_template()
     # handler = StdOutCallbackHandler() # Initialise an output callback handler for streaming
 
-
-    chain = RetrievalQA.from_chain_type(
-        llm=llm,
-        chain_type="stuff",
-        retriever=vectorstore.as_retriever(search_kwargs={"k": 1}),
-        chain_type_kwargs={"prompt": prompt},
-        return_source_documents=True,
+    chain = (
+        {"content": vectorstore.as_retriever(search_kwargs={"k": 1}) | format_docs, "question": RunnablePassthrough()}
+        | prompt
+        | llm
+        | StrOutputParser()
     )
+
+    # chain = RetrievalQA.from_chain_type(
+    #     llm=llm,
+    #     chain_type="stuff",
+    #     retriever=vectorstore.as_retriever(search_kwargs={"k": 1}),
+    #     chain_type_kwargs={"prompt": prompt},
+    #     return_source_documents=True,
+    # )
 
     return chain
 
