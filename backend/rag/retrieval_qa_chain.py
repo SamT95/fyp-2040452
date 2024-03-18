@@ -71,6 +71,7 @@ def create_qa_chain():
     pinecone_index = load_existing_index(index_name)
     text_field = "text"
     vectorstore = CustomPineconeVectorstore(pinecone_index, embeddings, text_field)
+    vectorstore_retriever = vectorstore.as_retriever(search_kwargs={"k": 2})
     prompt = create_prompt_template()
     # handler = StdOutCallbackHandler() # Initialise an output callback handler for streaming
 
@@ -82,7 +83,7 @@ def create_qa_chain():
     )
 
     chain_with_source = RunnableParallel(
-        {"context": vectorstore.as_retriever(search_kwargs={"k": 4}), "question": RunnablePassthrough()}
+        {"context": vectorstore_retriever, "question": RunnablePassthrough()}
     ).assign(answer=chain_from_docs)
     # chain = (
     #     {"context": vectorstore.as_retriever(search_kwargs={"k": 4}) | format_docs, "question": RunnablePassthrough()}
