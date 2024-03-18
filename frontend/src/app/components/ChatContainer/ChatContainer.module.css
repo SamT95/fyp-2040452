@@ -1,6 +1,6 @@
 .conversationContainer {
     width: 70%; /* Match the form's width */
-    background-color: #333; /* Light grey background for the conversation area */
+    background-color: #e8f0fe; /* Light blue background for the conversation area */
     margin-bottom: 20px; /* Space between the conversation area and the form */
     padding: 1em;
     overflow-y: auto; /* Allow scrolling for overflow */
@@ -8,7 +8,7 @@
     min-height: 700px;
     /* border-top: 3px solid #d52b1e;  */
     border-radius: 4px;
-    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    /* box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px; */
 }
 
 .clearFloat {
