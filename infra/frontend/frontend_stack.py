@@ -8,6 +8,7 @@ from aws_cdk import (
     aws_ssm as ssm,
     aws_route53 as route53,
     aws_iam as iam,
+    aws_logs as logs,
     CfnOutput,
 )
 from constructs import Construct
@@ -108,6 +109,13 @@ class FrontendStack(Stack):
             string_parameter_name="rag-chain-api-url"
         ).string_value
 
+        # Create log group for ECS task
+        log_group = logs.LogGroup(
+            self, "FrontendLogGroup",
+            log_group_name="/ecs/frontend",
+            retention=logs.RetentionDays.ONE_WEEK
+        )
+
         # Create task definition
         task_definition = ecs.FargateTaskDefinition(
             self, "TaskDef",
@@ -120,7 +128,11 @@ class FrontendStack(Stack):
             port_mappings=[ecs.PortMapping(container_port=3000)],
             environment={
                 "CHAIN_API_URL": chain_api_url
-            }
+            },
+            logging=ecs.LogDrivers.aws_logs(
+                stream_prefix="frontend",
+                log_group=log_group
+            )
         )
 
         # Create Fargate service
