@@ -1,8 +1,13 @@
 import styles from "./ChatMessage.module.css";
+import { BsRobot } from "react-icons/bs";
+import { FaRegUser } from "react-icons/fa";
+
+
 
 export default function ChatMessage({ message }) {
     return (
         <div className={message.sender === "bot" ? styles.botMessageContainer : styles.userMessageContainer}>
+            {message.sender === "bot" ? <div className={styles.botIcon}><BsRobot /></div> : null }
             <div className={message.sender === "bot" ? styles.botMessage : styles.userMessage}>
                 <p>
                     {message.message}
@@ -20,6 +25,7 @@ export default function ChatMessage({ message }) {
                 </div>
             )}
             </div>
+            {message.sender === "user" ? <div className={styles.userIcon}><FaRegUser /></div> : null }
         </div>
     )
 }
