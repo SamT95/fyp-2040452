@@ -7,6 +7,7 @@ from aws_cdk import (
     aws_certificatemanager as acm,
     aws_ssm as ssm,
     aws_route53 as route53,
+    aws_iam as iam,
     CfnOutput,
 )
 from constructs import Construct
@@ -70,6 +71,30 @@ class FrontendStack(Stack):
             vpc=vpc
         )
 
+        task_role = iam.Role(
+            self, "ECSTaskRole",
+            inline_policies={
+                "ECRAndSageMakerAccess": iam.PolicyDocument(
+                    statements=[
+                        iam.PolicyStatement(
+                            actions=[
+                                "ecr:GetAuthorizationToken",
+                                "ecr:BatchCheckLayerAvailability",
+                                "ecr:GetDownloadUrlForLayer",
+                                "ecr:BatchGetImage",
+                                "sagemaker:InvokeEndpoint"
+                            ],
+                            resources=["*"]
+                        ),
+                        iam.PolicyStatement(
+                            actions=["sagemaker:DescribeEndpoint"],
+                            resources=["arn:aws:sagemaker:eu-west-1:349382198749:endpoint/huggingface-rag-llm-endpoint"],
+                        ),
+                    ]
+                )
+            }
+        )
+
         # Connect to 'frontend' ECR repository
         ecr_repo = ecr.Repository.from_repository_name(
             self, "ECRRepo",
@@ -84,7 +109,8 @@ class FrontendStack(Stack):
 
         # Create task definition
         task_definition = ecs.FargateTaskDefinition(
-            self, "TaskDef"
+            self, "TaskDef",
+            task_role=task_role
         )
         task_definition.add_container(
             "FrontendContainer",
