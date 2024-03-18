@@ -1,0 +1,38 @@
+{
+  "vpc-provider:account=349382198749:filter.isDefault=true:region=eu-west-1:returnAsymmetricSubnets=true": {
+    "vpcId": "vpc-0e0c7bfbb2c1fa245",
+    "vpcCidrBlock": "172.31.0.0/16",
+    "ownerAccountId": "349382198749",
+    "availabilityZones": [],
+    "subnetGroups": [
+      {
+        "name": "Public",
+        "type": "Public",
+        "subnets": [
+          {
+            "subnetId": "subnet-091d0b6555c918d68",
+            "cidr": "172.31.0.0/20",
+            "availabilityZone": "eu-west-1a",
+            "routeTableId": "rtb-0057d84fd5323d47e"
+          },
+          {
+            "subnetId": "subnet-0f719909c8b694f95",
+            "cidr": "172.31.16.0/20",
+            "availabilityZone": "eu-west-1b",
+            "routeTableId": "rtb-0057d84fd5323d47e"
+          },
+          {
+            "subnetId": "subnet-0dbf28aa03ff56db1",
+            "cidr": "172.31.32.0/20",
+            "availabilityZone": "eu-west-1c",
+            "routeTableId": "rtb-0057d84fd5323d47e"
+          }
+        ]
+      }
+    ]
+  },
+  "hosted-zone:account=349382198749:domainName=up2040452-fyp.com:region=eu-west-1": {
+    "Id": "/hostedzone/Z0539527104H2QL1N7WWF",
+    "Name": "up2040452-fyp.com."
+  }
+}
