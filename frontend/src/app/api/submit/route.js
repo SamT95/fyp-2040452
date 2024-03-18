@@ -5,7 +5,7 @@ export async function POST(req) {
     const { message } = await req.json();
     // Send the message to the backend API and get a response
     try {
-        const response = await fetch(`${process.env.CHAIN_API_URL}/query`, {
+        const response = await fetch(`${process.env.CHAIN_API_URL}query`, {
             method: "POST",
             body: JSON.stringify({ query: message }),
             headers: {
