@@ -2,6 +2,15 @@
     width: max-content;
     max-width: 80%;
     clear: both;
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5em;
+}
+
+.botIcon svg, .userIcon svg {
+    height: 20px;
+    width: 20px;
+    fill: black;
 }
 
 .botMessageContainer {
@@ -14,17 +23,29 @@
 
 .botMessage {
     background-color: #00ccff; /* Light blue background for bot messages */
+    box-shadow: -1px 2px 0px #d4d4d4;
 }
 
 .userMessage {
-    background-color: #66ff66; /* Light green background for user messages */
+    background-color: white; /* Light green background for user messages */
+    /* background-color: #66ff66; */
+    box-shadow: 1px 2px 0px #d4d4d4;
 }
 
 .userMessage, .botMessage {
     padding: 0.5em;
     margin-bottom: 5px;
-    border-radius: 4px;
+    border-radius: 6px;
     color: black;
+}
+
+.botMessage {
+    border-bottom-left-radius: 0;
+}
+
+.userMessage {
+    border-bottom-right-radius: 0;
+
 }
 
 .sourceList {
