@@ -92,7 +92,8 @@ class FrontendStack(Stack):
                         ),
                     ]
                 )
-            }
+            },
+            assumed_by=iam.ServicePrincipal("ecs-tasks.amazonaws.com")
         )
 
         # Connect to 'frontend' ECR repository
