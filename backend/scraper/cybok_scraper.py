@@ -109,6 +109,36 @@ class CybokScraper(BaseScraper):
         """
         return fitz.open(stream=filestream, filetype="pdf")
     
+    def format_section_links(self, title):
+        """
+        This function formats the section titles to be used as a link.
+
+        Parameters:
+        title (str): The section title.
+
+        Returns:
+        str: The formatted section title.
+        """
+        parts = title.split(" ", 1) # Split the title into the chapter number and the chapter title
+        if len(parts) < 2:
+            return ("", "")
+        section_numbers = parts[0].split(".") # Split the chapter number into its parts
+        section_title = parts[1]
+
+        # Format section link based on the amount of numbers in the section number
+        if len(section_numbers) == 1:
+            section_ref = "#chapter.{}".format(*section_numbers)
+        elif len(section_numbers) == 2:
+            section_ref = "#section.{}.{}".format(*section_numbers)
+        elif len(section_numbers) == 3:
+            section_ref = "#subsection.{}.{}.{}".format(*section_numbers)
+        elif len(section_numbers) == 4:
+            section_ref = "#subsubsection.{}.{}.{}.{}".format(*section_numbers)
+        else:
+            section_ref = "#section.{}".format(*section_numbers)
+        
+        return (section_ref, section_title)
+    
     def extract_chapter_content(self, doc, toc):
         """
         This function extracts the content of each chapter from the PDF.
@@ -123,6 +153,7 @@ class CybokScraper(BaseScraper):
         extracted_text = []
         for i, toc_item in enumerate(toc):
             level, title, start_page = toc_item
+            section_ref, section_title = self.format_section_links(title=title)
 
             # Determine the end page of the current section
             # which is the start page of the next section (toc[level+1][2])
@@ -135,8 +166,8 @@ class CybokScraper(BaseScraper):
                 section_text += page_text
             
             extracted_text.append({
-                "source": self.url,
-                "title": title,
+                "source": f"{self.url}{section_ref}",
+                "title": section_title,
                 "text": section_text
             })
         return extracted_text
