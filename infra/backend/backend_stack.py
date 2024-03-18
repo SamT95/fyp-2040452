@@ -4,7 +4,8 @@ from aws_cdk import (
     aws_apigateway as apigw,
     aws_iam as iam,
     aws_ssm as ssm,
-    aws_lambda_python_alpha as _alambda
+    aws_lambda_python_alpha as _alambda,
+    aws_logs as logs,
 )
 from constructs import Construct
 
@@ -48,12 +49,21 @@ class BackendStack(Stack):
         self.qa_chain_lambda.role.add_to_policy(sagemaker_policy)
         self.qa_chain_lambda.role.add_to_policy(s3_policy)
 
-        # Define API gateway
+        # Create CloudWatch Log group for API gateway
+        log_group = logs.LogGroup(self, "QueryChainApiLogGroup",
+            log_group_name="/aws/api-gateway/rag-chain-api"
+        )
 
+        # Define REST API gateway
         self.chain_api = apigw.LambdaRestApi(
             self, "QueryChainAPI",
             handler=self.qa_chain_lambda,
             proxy=False,
+            cloud_watch_role=True,
+            deploy_options=apigw.StageOptions(
+                access_log_destination=apigw.LogGroupLogDestination(log_group),
+                access_log_format=apigw.AccessLogFormat.clf(),
+            )
         )
 
         query_resource = self.chain_api.root.add_resource("query")
