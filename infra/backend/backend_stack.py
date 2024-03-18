@@ -61,7 +61,7 @@ class BackendStack(Stack):
 
         # Store API URL in SSM
         ssm.StringParameter(self, "QueryChainAPIURL",
-            parameter_name="rag/chain-api-url",
+            parameter_name="rag-chain-api-url",
             string_value=self.chain_api.url
         )
 
