@@ -143,6 +143,7 @@ class FrontendStack(Stack):
         load_balanced_fargate_service = patterns.ApplicationLoadBalancedFargateService(
             self, "Service",
             cluster=ecs_cluster,
+            assign_public_ip=True,
             task_definition=task_definition,
             public_load_balancer=True,
             desired_count=1,
