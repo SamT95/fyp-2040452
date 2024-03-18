@@ -3,7 +3,7 @@ from aws_cdk import (
     aws_lambda as _lambda,
     aws_apigateway as apigw,
     aws_iam as iam,
-    aws_secretsmanager as secretsmanager,
+    aws_ssm as ssm,
     aws_lambda_python_alpha as _alambda
 )
 from constructs import Construct
@@ -58,4 +58,10 @@ class BackendStack(Stack):
 
         query_resource = self.chain_api.root.add_resource("query")
         query_resource.add_method("POST") 
+
+        # Store API URL in SSM
+        ssm.StringParameter(self, "QueryChainAPIURL",
+            parameter_name="rag/chain-api-url",
+            string_value=self.chain_api.url
+        )
 
