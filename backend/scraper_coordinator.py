@@ -27,8 +27,32 @@ def fetch_all_content(selected_scrapers):
         all_content.extend(adapted_content)
     return all_content
 
-def chunk_text(text, chunk_size=512):
-    chunks = [text[i:i+chunk_size] for i in range(0, len(text), chunk_size)]
+def chunk_text(text, title, chunk_size=512):
+    """
+    Chunk the text into chunks of approximately chunk_size characters
+    while maintaining whole words.
+    
+    Parameters:
+    - text (str): The text to chunk
+
+    Returns:
+    - List[str]: List of chunks
+    """
+    full_text = f"title: {title} text: {text}"
+    words = full_text.split()
+    chunks = []
+    current_chunk = []
+
+    for word in words:
+        if len(" ".join(current_chunk)) + len(word) < chunk_size:
+            current_chunk.append(word)
+        else:
+            chunks.append(" ".join(current_chunk))
+            current_chunk = [word]
+    
+    if current_chunk:
+        chunks.append(" ".join(current_chunk))
+
     return chunks
 
 ## Adapter functions to ensure congruency between the data from different sources
@@ -36,7 +60,7 @@ def adapt_cybok_data(cybok_data):
     adapted_data = []
     for chapter in cybok_data:
         # CyBOK chapter text can be quite long, so we chunk it into smaller pieces (512 words each) for embedding
-        text_chunks = chunk_text(chapter["text"], 512)
+        text_chunks = chunk_text(chapter["text"], chapter["title"], chunk_size=512)
         for chunk in text_chunks:
             adapted_data.append({
                 "text": chunk,

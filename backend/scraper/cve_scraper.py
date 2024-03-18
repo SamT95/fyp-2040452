@@ -33,7 +33,6 @@ class CveScraper(BaseScraper):
         print(f"Zip URL: {zip_url}")
         zip_response = requests.get(zip_url)
         zip_response.raise_for_status()
-        print(zip_response.content[:2])
         zip_bytes = io.BytesIO(zip_response.content)
 
 
@@ -64,8 +63,10 @@ class CveScraper(BaseScraper):
             cve_id = json_file.get("cveMetadata", {}).get("cveId", "")
             cve_published_data = json_file.get("cveMetadata", {}).get("datePublished", "")
             cve_containers = json_file.get("containers", {}).get("cna", {})
-            affected_products = cve_containers.get("affected", [])[0].get("product", "")
-            cve_description = cve_containers.get("descriptions", [])[0].get("value", "")
+            affected_products_list = cve_containers.get("affected", [])[0] if cve_containers.get("affected") else None
+            affected_products = affected_products_list.get("product") if affected_products_list else None
+            cve_description_list = cve_containers.get("descriptions", [])[0] if cve_containers.get("descriptions") else None
+            cve_description = cve_description_list.get("value") if cve_description_list else None
             cve_references = cve_containers.get("references", [])
             # References field is an array of dictionaries and needs to be formatted
             # to be stored in a Pinecone index
@@ -73,8 +74,8 @@ class CveScraper(BaseScraper):
             formatted_cve_data = {
                 "cve_id": cve_id,
                 "published_date": cve_published_data,
-                "affected_products": affected_products,
-                "description": cve_description,
+                "affected_products": affected_products if affected_products is not None else "N/A",
+                "description": cve_description if cve_description is not None else "N/A",
                 "references": cve_references
             }
             cve_data_list.append(formatted_cve_data)
