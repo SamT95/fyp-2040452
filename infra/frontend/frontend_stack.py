@@ -79,7 +79,7 @@ class FrontendStack(Stack):
         # Pull API URL from SSM
         chain_api_url = ssm.StringParameter.from_string_parameter_name(
             self, "ChainAPIURL",
-            string_parameter_name="rag/chain-api-url"
+            string_parameter_name="rag-chain-api-url"
         ).string_value
 
         # Create task definition
