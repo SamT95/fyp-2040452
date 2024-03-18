@@ -6,9 +6,6 @@ export async function POST(req) {
     // Pull the message from the request body
     const { message } = await req.json();
     // Send the message to the backend API and get a response
-    console.log("Incoming message: ", message)
-    console.log("API URL: ", `${process.env.CHAIN_API_URL}query`)
-
     try {
         const response = await axios.post(`${process.env.CHAIN_API_URL}query`, { 
             query: message
@@ -18,8 +15,6 @@ export async function POST(req) {
             },
             timeout: 30000,
         });
-        console.log("Response test: ", response.data)
-        console.log("Response error: ", response.error)
         if (response.statusText !== "OK") {
             console.error("Error from backend API", response.data.result);
             return NextResponse.json({
