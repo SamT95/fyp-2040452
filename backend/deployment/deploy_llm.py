@@ -7,9 +7,18 @@ logging.getLogger("sagemaker").setLevel(logging.WARNING)
 # Silence 'INFO' logging from huggingface_model.deploy()
 
 def deploy_language_model(role):
+    """
+    Function to deploy a Hugging Face language model to SageMaker Inference.
+
+    Params:
+    - role: SageMaker execution role
+
+    Returns:
+    None
+    """
     # Hub Model configuration. https://huggingface.co/models
-    
     # https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1
+
     hub = {
     	'HF_MODEL_ID':'mistralai/Mistral-7B-Instruct-v0.1',
     	'SM_NUM_GPUS': json.dumps(1)
