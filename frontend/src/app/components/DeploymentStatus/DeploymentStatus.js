@@ -9,8 +9,11 @@ export default function DeploymentStatus() {
         <div className={styles.deploymentStatusContainer}>
             {/* <button onClick={handleOpen} className={styles.button}>Check Deployment Status</button> */}
                 <div className={styles.deploymentStatus}>
-                    <p>Status: {deployed ? "Deployed" : "Not Deployed"}</p>
-                    <span className={styles.statusIcon} style={{ backgroundColor: deployed ? "green" : "red" }}></span>
+                    { /* WIP - Deployment Status */}
+                    {/* <p>Status: {deployed ? "Deployed" : "Not Deployed"}</p> */}
+                    {/* <span className={styles.statusIcon} style={{ backgroundColor: deployed ? "green" : "red" }}></span> */}
+                    <p>Status: Deployed</p>
+                    <span className={styles.statusIcon} style={{ backgroundColor: "green" }}></span>
                 </div>
         </div>
     )

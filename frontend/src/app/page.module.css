@@ -18,13 +18,15 @@
 .textarea {
   width: 80%;
   min-width: 500px; /* Minimum width of 300px */
-  background-color: #333; /* Dark grey background */
+  background-color: #e8f0fe; /* Light blue background */
+  /* background-color: #333 */
   color: white; /* Light color text */
   padding: 1em;
   border: none;
   border-radius: 4px;
   resize: none; /* Optional: Prevents resizing */
-  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  /* box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px; */
+
 }
 
 .button {
@@ -36,5 +38,7 @@
   border-radius: 4px;
   background-color: #007BFF; /* Example button color */
   color: white;
-  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  /* box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px; */
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+
 }
