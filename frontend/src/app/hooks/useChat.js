@@ -41,7 +41,9 @@ export default function useChat() {
             setLoading(false); // Set loading state to false after response
         } catch (error) {
             console.error("Failed to submit message:", error);
-            updateMessage(loadingMessageId - 1, "Sorry, something went wrong. Please try again.");
+            updateMessage(loadingMessageId - 1, {
+                message: "Sorry, something went wrong. Please try again.",
+            });
             setLoading(false); // Set loading state to false after response
         }
     }
