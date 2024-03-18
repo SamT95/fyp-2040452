@@ -45,5 +45,5 @@ jobs:
 
       - name: Deploy Backend CDK Stack
         run: |
-          cd infra/backend
+          cd infra
           cdk deploy BackendStack --require-approval never
