@@ -4,6 +4,9 @@ from aws_cdk import (
     aws_ec2 as ec2,
     aws_ecs_patterns as patterns,
     aws_ecr as ecr,
+    aws_certificatemanager as acm,
+    aws_ssm as ssm,
+    aws_route53 as route53,
     CfnOutput,
 )
 from constructs import Construct
@@ -12,8 +15,54 @@ class FrontendStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # Select default VPC - might need to change this
+        # Select default VPC
         vpc = ec2.Vpc.from_lookup(self, "VPC", is_default=True)
+
+        # Create security groups
+        vpc_endpoint_sg = ec2.SecurityGroup(self, "VpcEndpointSG", vpc=vpc)
+        ecs_task_sg = ec2.SecurityGroup(self, "ECSTaskSG", vpc=vpc, allow_all_outbound=True)
+
+        vpc_endpoint_sg.add_ingress_rule(
+            peer=ecs_task_sg,
+            connection=ec2.Port.tcp(443),
+            description="Allow HTTPS from ECS tasks"
+        )
+
+        # Create VPC endpoints for ECR, CloudWatch and S3
+        # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/vpc-endpoints.html
+        ecr_api_endpoint = vpc.add_interface_endpoint(
+            "ECREndpoint",
+            service=ec2.InterfaceVpcEndpointAwsService.ECR,
+            security_groups=[vpc_endpoint_sg]
+        )
+
+        ecr_docker_endpoint = vpc.add_interface_endpoint(
+            "ECRDockerEndpoint",
+            service=ec2.InterfaceVpcEndpointAwsService.ECR_DOCKER,
+            security_groups=[vpc_endpoint_sg]
+        )
+
+        cloudwatch_logs_endpoint = vpc.add_interface_endpoint(
+            "CloudWatchLogsEndpoint",
+            service=ec2.InterfaceVpcEndpointAwsService.CLOUDWATCH_LOGS,
+            security_groups=[vpc_endpoint_sg]
+        )
+
+        s3_gateway_endpoint = vpc.add_gateway_endpoint(
+            "S3GatewayEndpoint",
+            service=ec2.GatewayVpcEndpointAwsService.S3,
+        )
+
+        # Referemce Route53 hosted zone
+        my_hosted_zone = route53.HostedZone.from_lookup(self, "MyHostedZone",
+            domain_name="up2040452-fyp.com"
+        )
+
+        # Create a certificate for the domain
+        certificate = acm.Certificate(self, "SiteCertificate",
+            domain_name="up2040452-fyp.com",
+            validation=acm.CertificateValidation.from_dns(my_hosted_zone)
+        )
 
         # Create ECS cluster
         ecs_cluster = ecs.Cluster(
@@ -27,6 +76,12 @@ class FrontendStack(Stack):
             repository_name="frontend"
         )
 
+        # Pull API URL from SSM
+        chain_api_url = ssm.StringParameter.from_string_parameter_name(
+            self, "ChainAPIURL",
+            string_parameter_name="rag/chain-api-url"
+        ).string_value
+
         # Create task definition
         task_definition = ecs.FargateTaskDefinition(
             self, "TaskDef"
@@ -35,7 +90,10 @@ class FrontendStack(Stack):
             "FrontendContainer",
             image=ecs.ContainerImage.from_ecr_repository(ecr_repo),
             memory_limit_mib=512,
-            port_mappings=[ecs.PortMapping(container_port=3000)]
+            port_mappings=[ecs.PortMapping(container_port=3000)],
+            environment={
+                "CHAIN_API_URL": chain_api_url
+            }
         )
 
         # Create Fargate service
@@ -44,7 +102,11 @@ class FrontendStack(Stack):
             cluster=ecs_cluster,
             task_definition=task_definition,
             public_load_balancer=True,
-            desired_count=1
+            desired_count=1,
+            security_groups=[ecs_task_sg],
+            certificate=certificate,
+            domain_name="up2040452-fyp.com",
+            domain_zone=my_hosted_zone,
         )
 
         # Output the load balancer address
