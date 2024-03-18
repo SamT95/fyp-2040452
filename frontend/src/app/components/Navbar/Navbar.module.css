@@ -1,0 +1,30 @@
+.navbar {
+    background-color: #f8f9fa;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    top: 0;
+}
+
+.navbarContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbarTitle {
+    color: black;
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.githubButton {
+    min-width: 100px; /* Minimum width of 100px */
+    padding: 0.5rem 1rem 0.5rem 1rem;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    border: 2px solid #000;
+}
