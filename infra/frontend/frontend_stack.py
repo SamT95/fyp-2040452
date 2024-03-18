@@ -103,6 +103,9 @@ class FrontendStack(Stack):
             repository_name="frontend"
         )
 
+        # Pull image tag from context
+        image_tag = self.node.try_get_context("imageTag")
+
         # Pull API URL from SSM
         chain_api_url = ssm.StringParameter.from_string_parameter_name(
             self, "ChainAPIURL",
@@ -121,9 +124,10 @@ class FrontendStack(Stack):
             self, "TaskDef",
             task_role=task_role
         )
+
         task_definition.add_container(
             "FrontendContainer",
-            image=ecs.ContainerImage.from_ecr_repository(ecr_repo),
+            image=ecs.ContainerImage.from_ecr_repository(ecr_repo, tag=image_tag),
             memory_limit_mib=512,
             port_mappings=[ecs.PortMapping(container_port=3000)],
             environment={

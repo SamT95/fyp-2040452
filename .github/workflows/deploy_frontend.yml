@@ -37,7 +37,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: "frontend"
-          IMAGE_TAG: latest
+          IMAGE_TAG: ${{ github.sha }}
         run: |
             # Build a docker container and push it to ECR
             docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./frontend
@@ -66,6 +66,6 @@ jobs:
       - name: Deploy Frontend CDK Stack
         run: |
           cd infra
-          cdk deploy FrontendStack --require-approval never
+          cdk deploy FrontendStack --require-approval never -c imageTag=${{ github.sha }}
 
 
