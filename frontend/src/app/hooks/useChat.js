@@ -30,7 +30,10 @@ export default function useChat() {
             const responseData = await response.json();
             const sources = responseData.body.sources;
             const sourceIdsAndReferences = sources.map(source => {
-                const { id, references } = source.metadata;
+                // Some sources have a 'id' prop, whereas some have 'title'
+                // we attempt to pull out both, and use the one that exists
+                const id = source.metadata.id || source.metadata.title;
+                const references = source.metadata.references || source.metadata.source;
                 return { id, references };
             })
             const newMessage = responseData.body.message;
