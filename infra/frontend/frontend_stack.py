@@ -138,6 +138,12 @@ class FrontendStack(Stack):
                 stream_prefix="frontend",
                 log_group=log_group
             ),
+            health_check=ecs.HealthCheck(
+                command=["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"],
+                interval=Duration.seconds(60),
+                timeout=Duration.seconds(5),
+                retries=3
+            )
         )
 
         # Create Fargate service
