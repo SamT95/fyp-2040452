@@ -136,6 +136,13 @@ class FrontendStack(Stack):
             logging=ecs.LogDrivers.aws_logs(
                 stream_prefix="frontend",
                 log_group=log_group
+            ),
+            health_check=ecs.HealthCheck(
+                command=["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"],
+                interval=ecs.Duration.minutes(3),
+                timeout=ecs.Duration.seconds(20),
+                retries=3,
+                start_period=ecs.Duration.seconds(20)
             )
         )
 
