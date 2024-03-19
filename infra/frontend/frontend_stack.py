@@ -10,6 +10,7 @@ from aws_cdk import (
     aws_iam as iam,
     aws_logs as logs,
     CfnOutput,
+    Duration,
 )
 from constructs import Construct
 
@@ -139,10 +140,10 @@ class FrontendStack(Stack):
             ),
             health_check=ecs.HealthCheck(
                 command=["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"],
-                interval=ecs.Duration.minutes(3),
-                timeout=ecs.Duration.seconds(20),
+                interval=Duration.minutes(3),
+                timeout=Duration.seconds(20),
                 retries=3,
-                start_period=ecs.Duration.seconds(20)
+                start_period=Duration.seconds(20)
             )
         )
 
