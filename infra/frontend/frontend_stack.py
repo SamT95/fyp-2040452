@@ -138,13 +138,6 @@ class FrontendStack(Stack):
                 stream_prefix="frontend",
                 log_group=log_group
             ),
-            health_check=ecs.HealthCheck(
-                command=["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"],
-                interval=Duration.minutes(3),
-                timeout=Duration.seconds(20),
-                retries=3,
-                start_period=Duration.seconds(20)
-            )
         )
 
         # Create Fargate service
@@ -159,6 +152,16 @@ class FrontendStack(Stack):
             certificate=certificate,
             domain_name="up2040452-fyp.com",
             domain_zone=my_hosted_zone,
+        )
+
+        alb_target_group = load_balanced_fargate_service.target_group
+        alb_target_group.configure_health_check(
+            path="/api/health",
+            healthy_http_codes="200",
+            healthy_threshold_count=3,
+            unhealthy_threshold_count=2,
+            interval=Duration.seconds(60),
+            timeout=Duration.seconds(5)
         )
 
         # Output the load balancer address
