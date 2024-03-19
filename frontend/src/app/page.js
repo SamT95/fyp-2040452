@@ -4,6 +4,8 @@ import { useState } from "react";
 import useStore from "@/app/store/useStore";
 import ChatContainter from "@/app/components/ChatContainer/ChatContainer";
 import useChat from "@/app/hooks/useChat";
+import Hero from "./components/Hero/Hero";
+import Intro from "./components/Intro/Intro";
 
 export default function Chat() {
     const [message, setMessage] = useState("");
@@ -21,12 +23,22 @@ export default function Chat() {
     }
 
     return (
-        <div className={styles.formContainer}>
-            <ChatContainter />
-            <form onSubmit={handleSubmit} className={styles.form}>
-                <textarea name="message" placeholder="Type your message here." className={styles.textarea} value={message} onChange={(e) => setMessage(e.target.value)} required/>
-                <button type="submit" className={styles.button}>Send</button>
-            </form>
+      <div className={styles.pageContainer}>
+        <div className={styles.heroSection}>
+          <Hero />
         </div>
+        <div className={styles.contentWrapper}>
+          <div className={styles.introSection}>
+              <Intro />
+          </div>
+          <div className={styles.formContainer}>
+              <ChatContainter />
+              <form onSubmit={handleSubmit} className={styles.form}>
+                  <textarea name="message" placeholder="Ask me about cyber security." className={styles.textarea} value={message} onChange={(e) => setMessage(e.target.value)} required/>
+                  <button type="submit" className={styles.button}>Send</button>
+              </form>
+          </div>
+        </div>
+      </div>
     )
 }
