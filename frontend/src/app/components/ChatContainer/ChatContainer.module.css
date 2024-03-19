@@ -9,6 +9,19 @@
     /* border-top: 3px solid #d52b1e;  */
     border-radius: 4px;
     /* box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px; */
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+}
+
+.messagesContainer {
+    flex-grow: 1;
+}
+
+.promptHints {
+    display: flex;
+    justify-content: flex-start;
+    gap: 1em;
 }
 
 .clearFloat {
