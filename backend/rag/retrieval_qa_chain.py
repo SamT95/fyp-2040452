@@ -25,13 +25,16 @@ def create_prompt_template():
     The template is a string containing the text to be prepended to the user's question.
     The template also contains a placeholder for the user's question 
     and a placeholder for the context retrieved from the Pinecone index.
+
+    Returns:
+    - PromptTemplate: A Langchain prompt template object
     """
 
     prompt_template = """
     Act as a helpful cyber security expert and answer the question below.
     If you do not know the answer to the question, explain that you do not know.
     Context is provided above the question and acts as additional information to complement your built-in knowledge.
-    Utilise the context and your knowledge to answer the question and provide citations for any context used.
+    Utilise the context and your knowledge to answer the question. Do not directly provide sources or references in your answer.
 
     Context: {context}
 
