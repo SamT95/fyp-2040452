@@ -1,5 +1,5 @@
 .conversationContainer {
-    width: 70%; /* Match the form's width */
+    width: 100%; /* Match the form's width */
     background-color: #e8f0fe; /* Light blue background for the conversation area */
     margin-bottom: 20px; /* Space between the conversation area and the form */
     padding: 1em;
