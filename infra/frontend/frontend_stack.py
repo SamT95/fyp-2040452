@@ -142,6 +142,7 @@ class FrontendStack(Stack):
                 command=["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"],
                 interval=Duration.seconds(60),
                 timeout=Duration.seconds(5),
+                start_period=Duration.seconds(60),
                 retries=3
             )
         )
@@ -155,6 +156,7 @@ class FrontendStack(Stack):
             public_load_balancer=True,
             desired_count=1,
             security_groups=[ecs_task_sg],
+            listener_port=443,
             certificate=certificate,
             domain_name="up2040452-fyp.com",
             domain_zone=my_hosted_zone,
