@@ -42,6 +42,13 @@ def batch_embeddings(chunks, batch_size=10):
     This function generates embeddings for the chunks of text using the Cohere API.
     The chunks are passed in as a list of strings.
     The batch size is set to 10 by default, but can be modified.
+
+    Parameters:
+    - chunks (list): A list of strings to generate embeddings for
+    - batch_size (int): The number of chunks to process in each batch
+
+    Returns:
+    - list: A list of embeddings
     """
 
     cohere_api_key = fetch_cohere_key()
