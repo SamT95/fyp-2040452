@@ -23,7 +23,19 @@ def lambda_handler(event, context):
             "body": json.dumps({"error": "Query parameter not found in request body"})
         }
     # Initialize and run the QA chain
-    output = chain.invoke(query)
+    output = {}
+    current_key = None
+    for chunk in chain.stream(query):
+        for key in chunk:
+            if key in output:
+                output[key] += chunk[key]
+            else:
+                output[key] = chunk[key]
+            if key != current_key:
+                logger.info(f"{key}: {chunk[key]}")
+            else:
+                logger.info(f"Chunk: {chunk[key]}")
+            current_key = key
     logger.info(f"Output: {output}")
 
 

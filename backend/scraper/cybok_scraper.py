@@ -159,12 +159,13 @@ class CybokScraper(BaseScraper):
             # which is the start page of the next section (toc[level+1][2])
             end_page = toc[i+1][2] if i + 1 < len(toc) else len(doc)
             section_text = ""
-            for page_number in range(start_page, end_page):
+            if start_page == end_page:
+                end_page += 1
+            for page_number in range(start_page - 1, end_page):
                 page = doc.load_page(page_number)
                 page_text = page.get_text()
                 page_text = self.preprocess_text(page_text)
                 section_text += page_text
-            
             extracted_text.append({
                 "source": f"{self.url}{section_ref}",
                 "title": section_title,
@@ -193,12 +194,12 @@ class CybokScraper(BaseScraper):
                 break
         if appendix_start_index is not None:
             # Exclude "VI Appendix" and any sub-sections that follow
-            # This assumes the sub-chapters have a higher 'level' than the 'VI Appendix' chapter
+            # This assumes the sub-chapters have a higher 'level'
             # indicating that they are children of the 'VI Appendix' chapter
             toc_without_appendix = [item for i, item in enumerate(toc) if i < appendix_start_index or item[0] < toc[appendix_start_index][0]]
             return toc_without_appendix
         else:
-            # Return the original TOC if the "VI Appendix" chapter is not found
+            # Return the original TOC if "VI Appendix" chapter not found
             return toc
     
     def extract_all_data(self):
