@@ -18,8 +18,16 @@ export default function Chat() {
             return;
         }
 
-        await sendMessage(message);
+        const userMessage = message;
         setMessage("");
+        await sendMessage(userMessage);
+    }
+
+    function handleKeyDown(event) {
+        if (event.key === "Enter" && !event.shiftKey) {
+            event.preventDefault();
+            handleSubmit(event);
+        }
     }
 
     return (
@@ -34,8 +42,17 @@ export default function Chat() {
           <div className={styles.formContainer}>
               <ChatContainter />
               <form onSubmit={handleSubmit} className={styles.form}>
-                  <textarea name="message" placeholder="Ask me about cyber security." className={styles.textarea} value={message} onChange={(e) => setMessage(e.target.value)} required/>
-                  <button type="submit" className={styles.button}>Send</button>
+                  <textarea
+                  id="messagetextarea" 
+                  onKeyDown={handleKeyDown} 
+                  name="message" 
+                  placeholder="Ask me about cyber security."
+                  aria-label="Message input field." 
+                  className={styles.textarea} 
+                  value={message} 
+                  onChange={(e) => setMessage(e.target.value)} required
+                  />
+                  <button type="submit" aria-label="Submit" className={styles.button}>Send</button>
               </form>
           </div>
         </div>
