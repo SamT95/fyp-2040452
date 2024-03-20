@@ -6,7 +6,7 @@ import { FaRegUser } from "react-icons/fa";
 
 export default function ChatMessage({ message }) {
     return (
-        <div className={message.sender === "bot" ? styles.botMessageContainer : styles.userMessageContainer}>
+        <div aria-live="polite" className={message.sender === "bot" ? styles.botMessageContainer : styles.userMessageContainer}>
             {message.sender === "bot" ? <div className={styles.botIcon}><BsRobot /></div> : null }
             <div className={message.sender === "bot" ? styles.botMessage : styles.userMessage}>
                 <p>
@@ -18,7 +18,10 @@ export default function ChatMessage({ message }) {
                     <ul className={styles.sourceList}>
                         {message.sources.map((source, index) => (
                             <li key={index} className={styles.sourceItem}>
-                                <a href={Array.isArray(source.references) ? source.references[index] : source.references} target="-blank" rel="noopener noreferrer">{source.id}</a>
+                                <a className={styles.sourceLink} 
+                                href={Array.isArray(source.references) ? source.references[index] : source.references} target="-blank" rel="noopener noreferrer">
+                                    {source.id}
+                                </a>
                             </li>
                         ))}
                     </ul>
