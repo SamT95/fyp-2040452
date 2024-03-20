@@ -17,6 +17,7 @@ export default function ChatContainer() {
 
         await sendMessage(message);
     }
+    
     return (
         <>
         <div className={styles.conversationContainer}>
