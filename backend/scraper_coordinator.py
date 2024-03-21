@@ -12,7 +12,7 @@ def fetch_all_content(selected_scrapers):
     scraper_to_adapter_map = {
         "cybok": (CybokScraper(), adapt_cybok_data),
         "cve": (CveScraper(), adapt_cve_data),
-        # "cisa": (CisaScraper(), adapt_cisa_data) - to be implemented
+        # "cisa": (CisaScraper(), adapt_cisa_data)
     }
 
     all_content = []
@@ -27,7 +27,7 @@ def fetch_all_content(selected_scrapers):
         all_content.extend(adapted_content)
     return all_content
 
-def chunk_text(text, title, chunk_size=512):
+def chunk_text(text, title, chunk_size=1024):
     """
     Chunk the text into chunks of approximately chunk_size characters
     while maintaining whole words.
@@ -59,8 +59,8 @@ def chunk_text(text, title, chunk_size=512):
 def adapt_cybok_data(cybok_data):
     adapted_data = []
     for chapter in cybok_data:
-        # CyBOK chapter text can be quite long, so we chunk it into smaller pieces (512 words each) for embedding
-        text_chunks = chunk_text(chapter["text"], chapter["title"], chunk_size=512)
+        # CyBOK chapter text can be quite long, so we chunk it into smaller pieces (1024 chars each) for embedding
+        text_chunks = chunk_text(chapter["text"], chapter["title"], chunk_size=1024)
         for chunk in text_chunks:
             adapted_data.append({
                 "text": chunk,
@@ -74,9 +74,9 @@ def adapt_cybok_data(cybok_data):
 def adapt_cve_data(cve_data):
     adapted_data = []
     for item in cve_data:
-        # Combine the description, id, and other key metadata into a single text for embedding
-        # This ensures things like the CVE ID are included in the embedding and can be used
-        # for similarity search (i.e. if someone asks a question about a specific CVE ID, we can find the most similar embeddings to that ID)
+        # Combine the description, id, and other metadata into a single text for embedding
+        # This ensures things like the CVE ID are included in the embedding,
+        # which is useful for similarity search
         combined_text = f"CVE ID: {item['cve_id']} Description: {item['description']} Affected Products: {item['affected_products']} Published Date: {item['published_date']}" 
         adapted_data.append({
             "text": combined_text,
@@ -132,7 +132,6 @@ def main(selected_scrapers):
 
 
 if __name__ == "__main__":
-    # main()
     parser = argparse.ArgumentParser(description="Run specific data scrapers and upsert to Pinecone index.")
     parser.add_argument("--scrapers", nargs="+", help="The scrapers to run. Options: cybok, cve, cisa")
     args = parser.parse_args()
