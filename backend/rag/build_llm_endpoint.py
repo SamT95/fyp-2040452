@@ -31,7 +31,8 @@ class ContentHandler(LLMContentHandler):
             "inputs": prompt,
             **model_kwargs,
         }
-        return input_data
+        serialized_input = json.dumps(input_data).encode('utf-8')
+        return serialized_input
     
     def transform_output(self, output: bytes) -> str:
         # response_json = json.loads(output.read().decode('utf-8'))
