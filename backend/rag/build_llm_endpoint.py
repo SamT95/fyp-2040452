@@ -1,4 +1,5 @@
 from langchain.llms.sagemaker_endpoint import LLMContentHandler
+from langchain_openai import ChatOpenAi
 from langchain_community.llms import SagemakerEndpoint
 from botocore.exceptions import ClientError
 from typing import Dict
@@ -16,7 +17,7 @@ class ContentHandler(LLMContentHandler):
     def transform_input(self, prompt: str, model_kwargs: Dict) -> bytes:
         input_string = json.dumps(
             {
-                'inputs': f'<s>[INST] {prompt} [/INST]',
+                'inputs': prompt,
                 'parameters': {**model_kwargs}
             }
         )
@@ -24,8 +25,7 @@ class ContentHandler(LLMContentHandler):
     
     def transform_output(self, output: bytes) -> str:
         response_json = json.loads(output.read().decode('utf-8'))
-        answer_split = response_json[0]['generated_text'].split('[/INST] ')
-        return answer_split[1]
+        return response_json['generated_text']
 
 
 def build_sagemaker_llm_endpoint(role):
@@ -48,5 +48,6 @@ def build_sagemaker_llm_endpoint(role):
         content_handler=content_handler,
         client=sagemaker_runtime,
     )
+
 
     return llm
