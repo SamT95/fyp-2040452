@@ -5,6 +5,10 @@ from typing import Dict
 import boto3
 import os
 import json
+import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 class ContentHandler(LLMContentHandler):
@@ -24,7 +28,8 @@ class ContentHandler(LLMContentHandler):
     
     def transform_output(self, output: bytes) -> str:
         response_json = json.loads(output.read().decode('utf-8'))
-        return response_json.get('generated_text', 'No output key found')
+        logger.log(logging.INFO, f"Response JSON: {response_json}")
+        return response_json[0]['generated_text']
 
 
 def build_sagemaker_llm_endpoint(role):
