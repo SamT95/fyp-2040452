@@ -42,9 +42,6 @@ def deploy_language_model(role):
 
     # deploy model to SageMaker Inference
     predictor = huggingface_model.deploy(
-    	initial_instance_count=1,
-    	instance_type="ml.g5.2xlarge",
-    	container_startup_health_check_timeout=300,
       endpoint_name=endpoint_name,
       serverless_config=serverless_config,
       )
