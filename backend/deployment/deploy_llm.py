@@ -22,11 +22,10 @@ def deploy_language_model(role):
 
     hub = {
     	'HF_MODEL_ID':'distilbert/distilgpt2',
-    	'SM_NUM_GPUS': json.dumps(1)
     }
     
     huggingface_model = HuggingFaceModel(
-    	image_uri=get_huggingface_llm_image_uri("huggingface",version="1.1.0"),
+    	image_uri=get_huggingface_llm_image_uri("huggingface",version="1.4.2"),
     	env=hub,
     	role=role, 
     )
