@@ -35,10 +35,10 @@ class ContentHandler(LLMContentHandler):
         return serialized_input
     
     def transform_output(self, output: bytes) -> str:
-        # response_json = json.loads(output.read().decode('utf-8'))
+        response_json = json.loads(output.read().decode('utf-8'))
         # logger.log(logging.INFO, f"Response JSON: {response_json}")
-        logger.info(f"Output: {output}")
-        generated_text = output.get("choices", [{}])[0].get("text", "").strip()
+        logger.info(f"Output: {response_json}")
+        generated_text = response_json["generated_text"]
         return generated_text
 
 
