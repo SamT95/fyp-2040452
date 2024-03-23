@@ -24,7 +24,7 @@ class ContentHandler(LLMContentHandler):
     
     def transform_output(self, output: bytes) -> str:
         response_json = json.loads(output.read().decode('utf-8'))
-        return response_json['generated_text']
+        return response_json[0]['generated_text']
 
 
 def build_sagemaker_llm_endpoint(role):
