@@ -43,7 +43,7 @@ def deploy_language_model(role):
     # deploy model to SageMaker Inference
     predictor = huggingface_model.deploy(
       endpoint_name=endpoint_name,
-      serverless_config=serverless_config,
+      serverless_inference_config=serverless_config,
       )
     
     endpoint_name = predictor.endpoint_name
