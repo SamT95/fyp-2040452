@@ -18,18 +18,27 @@ class ContentHandler(LLMContentHandler):
 
     # Mistral-7B-Instruct requires <s>[INST] boundary tokens in input
     def transform_input(self, prompt: str, model_kwargs: Dict) -> bytes:
-        input_string = json.dumps(
-            {
-                'inputs': prompt,
-                'parameters': {**model_kwargs}
-            }
-        )
-        return input_string.encode('utf-8')
+        """
+        Transforms the input for GPT-2.
+        Parameters:
+        prompt (str): The prompt text to generate text from.
+        model_kwargs (dict): Additional model-specific arguments.
+
+        Returns:
+        dict: A dictionary with the formatted input for GPT-2.
+        """
+        input_data = {
+            "inputs": prompt,
+            **model_kwargs,
+        }
+        return input_data
     
     def transform_output(self, output: bytes) -> str:
-        response_json = json.loads(output.read().decode('utf-8'))
-        logger.log(logging.INFO, f"Response JSON: {response_json}")
-        return response_json[0]['generated_text']
+        # response_json = json.loads(output.read().decode('utf-8'))
+        # logger.log(logging.INFO, f"Response JSON: {response_json}")
+        logger.info(f"Output: {output}")
+        generated_text = output.get("choices", [{}])[0].get("text", "").strip()
+        return generated_text
 
 
 def build_sagemaker_llm_endpoint(role):
