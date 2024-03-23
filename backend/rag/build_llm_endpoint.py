@@ -38,7 +38,7 @@ class ContentHandler(LLMContentHandler):
         response_json = json.loads(output.read().decode('utf-8'))
         # logger.log(logging.INFO, f"Response JSON: {response_json}")
         logger.info(f"Output: {response_json}")
-        generated_text = response_json["generated_text"]
+        generated_text = response_json[0]["generated_text"]
         return generated_text
 
 
