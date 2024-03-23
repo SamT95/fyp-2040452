@@ -1,5 +1,4 @@
 from langchain.llms.sagemaker_endpoint import LLMContentHandler
-from langchain_openai import ChatOpenAi
 from langchain_community.llms import SagemakerEndpoint
 from botocore.exceptions import ClientError
 from typing import Dict
