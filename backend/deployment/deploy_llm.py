@@ -1,4 +1,5 @@
 from sagemaker.huggingface import HuggingFaceModel, get_huggingface_llm_image_uri
+from sagemaker.serverless import ServerlessInferenceConfig
 import json
 import sys # For sys.stdout during GitHub Actions
 import logging
@@ -30,6 +31,13 @@ def deploy_language_model(role):
     	role=role, 
     )
 
+    # Set up AWS Serverless Inference Config (https://sagemaker.readthedocs.io/en/stable/overview.html#sagemaker-serverless-inference)
+
+    serverless_config = ServerlessInferenceConfig(
+      memory_size_in_mb=4096,
+      max_concurrency=2,
+    )
+
     endpoint_name="huggingface-rag-llm-endpoint"
 
     # deploy model to SageMaker Inference
@@ -38,6 +46,7 @@ def deploy_language_model(role):
     	instance_type="ml.g5.2xlarge",
     	container_startup_health_check_timeout=300,
       endpoint_name=endpoint_name,
+      serverless_config=serverless_config,
       )
     
     endpoint_name = predictor.endpoint_name
