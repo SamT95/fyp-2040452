@@ -34,7 +34,7 @@ def deploy_language_model(role):
     # Set up AWS Serverless Inference Config (https://sagemaker.readthedocs.io/en/stable/overview.html#sagemaker-serverless-inference)
 
     serverless_config = ServerlessInferenceConfig(
-      memory_size_in_mb=4096,
+      memory_size_in_mb=6144,
       max_concurrency=2,
     )
 
