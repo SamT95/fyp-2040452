@@ -21,7 +21,7 @@ def deploy_language_model(role):
     # https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1
 
     hub = {
-    	'HF_MODEL_ID':'mistralai/Mistral-7B-Instruct-v0.1',
+    	'HF_MODEL_ID':'distilbert/distilgpt2',
     	'SM_NUM_GPUS': json.dumps(1)
     }
     
