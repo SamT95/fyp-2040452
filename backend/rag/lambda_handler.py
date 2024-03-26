@@ -1,5 +1,6 @@
 import json
 from retrieval_qa_chain import create_qa_chain
+from langchain_core.messages import HumanMessage
 import logging
 
 # Set up logging
@@ -15,6 +16,7 @@ chain = create_qa_chain()
 def lambda_handler(event, context):
     # Extract query from API Gateway event
     logger.info(f"Event: {event}")
+    chat_history = []
     try:
         query = json.loads(event["body"])["query"]
     except KeyError:
@@ -36,7 +38,8 @@ def lambda_handler(event, context):
     #         else:
     #             logger.info(f"Chunk: {chunk[key]}")
     #         current_key = key
-    output = chain.invoke(query)
+    output = chain.invoke({"question": query, "chat_history": chat_history})
+    chat_history.extend([HumanMessage(content=query), output])
     logger.info(f"Output: {output}")
 
 
