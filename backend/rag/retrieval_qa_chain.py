@@ -42,6 +42,7 @@ def create_prompt_template():
     If you do not know the answer to the question, explain that you do not know.
     Use the following pieces of retrieved context to answer the question.
     Keep the answer concise and informative.
+    Reference the retrieved context in your answer.
 
 
     Context: {context}
