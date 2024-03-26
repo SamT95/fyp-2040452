@@ -20,7 +20,8 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
+cohere_api_key = fetch_cohere_key()
+os.environ["COHERE_API_KEY"] = cohere_api_key
 sagemaker_execution_role = os.environ.get("SAGEMAKER_EXECUTION_ROLE")
 llm = build_sagemaker_llm_endpoint(sagemaker_execution_role)
 chat_llm = ChatCohere(model="command", max_tokens="512",  temperature="0.1")
@@ -97,7 +98,6 @@ def create_qa_chain():
     The chain is built using Langchain.
     The Pinecone vectorstore is used as a retriever and Cohere is used as an embedding model.
     """
-    cohere_api_key = fetch_cohere_key()
     embeddings = CustomCohereEmbeddings(
         model="embed-english-v3.0",
         cohere_api_key=cohere_api_key,
