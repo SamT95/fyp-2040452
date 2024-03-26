@@ -59,32 +59,26 @@ def create_prompt_template():
 
     return system_prompt
 
-def contextualize_prompt_and_history():
-    """
-    This function returns a chain that reformulates an incoming prompt.
-    It utilises a message placeholder for the chat history and 
-    features a system prompt that tells the model to reformulate the question.
-    """
 
-    system_prompt = """
-    Given a conversation history and the latest human user question, which might reference context
-    in the conversation history, create a standalone question which can be answered without the chat history.
-    DO NOT answer the question, just reformulate it if needed, or return it as is.
-    """
-    contextualize_prompt = ChatPromptTemplate.from_messages(
-        [
-            ("system", system_prompt),
-            MessagesPlaceholder(variable_name="chat_history"),
-            ("human", "{question}")
-        ]
-    )
-    contextualize_prompt_chain = contextualize_prompt | llm | StrOutputParser()
-    return contextualize_prompt_chain
+
+system_prompt = """
+Given a conversation history and the latest human user question, which might reference context
+in the conversation history, create a standalone question which can be answered without the chat history.
+DO NOT answer the question, just reformulate it if needed, or return it as is.
+"""
+contextualize_prompt = ChatPromptTemplate.from_messages(
+    [
+        ("system", system_prompt),
+        MessagesPlaceholder(variable_name="chat_history"),
+        ("human", "{question}")
+    ]
+)
+contextualize_prompt_chain = contextualize_prompt | llm | StrOutputParser()
+
 
 def contextualized_prompt(input: dict):
-    context_chain = contextualize_prompt_and_history()
     if "chat_history" in input:
-        return context_chain
+        return contextualize_prompt_chain
     else:
         return input["question"]
 
@@ -117,7 +111,7 @@ def create_qa_chain():
 
     rag_chain = (
         RunnablePassthrough.assign(
-            context=contextualize_prompt_and_history | retriever | format_docs
+            context=contextualized_prompt | retriever | format_docs
         )
         | prompt
         | llm
