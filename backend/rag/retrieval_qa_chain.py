@@ -119,7 +119,7 @@ def create_qa_chain():
         )
         | RunnablePassthrough.assign(context = lambda docs: format_docs(docs["context"]) )
         | RunnablePassthrough.assign(prompt=prompt)
-        | RunnablePassthrough.assign(response = lambda docs: llm(docs["prompt"].messages))
+        | RunnablePassthrough.assign(response = lambda prompt: llm(prompt) )
     )
 
     return rag_chain
