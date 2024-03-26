@@ -29,6 +29,9 @@ def create_prompt_template():
     The template is a string containing the text to be prepended to the user's question.
     The template also contains a placeholder for the user's question 
     and a placeholder for the context retrieved from the Pinecone index.
+
+    Returns:
+    - PromptTemplate: A Langchain prompt template object
     """
 
     prompt_template = """
@@ -36,6 +39,7 @@ def create_prompt_template():
     If you do not know the answer to the question, explain that you do not know.
     Use the following pieces of retrieved context to answer the question.
     Keep the answer concise and informative.
+
 
     Context: {context}
     """
