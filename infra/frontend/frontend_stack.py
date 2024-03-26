@@ -168,41 +168,5 @@ class FrontendStack(Stack):
         # Output the load balancer address
         self.lb_address = load_balanced_fargate_service.load_balancer.load_balancer_dns_name
         CfnOutput(self, "LoadBalancerDNS", value=self.lb_address)
-
-
-
-        # Old - Cloudfront and S3
-        # site_bucket = s3.Bucket(
-        #     self, "SiteBucket",
-        #     website_index_document="index.html",
-        #     public_read_access=False
-        # )
-
-        # s3deploy.BucketDeployment(
-        #     self, "DeployFrontend",
-        #     sources=[s3deploy.Source.asset("../frontend/dist")],
-        #     destination_bucket=site_bucket,
-        # )
-
-        # # Create an OAI so that the CloudFront distribution can access the private S3 bucket
-        # site_oai = cloudfront.OriginAccessIdentity(self, "SiteOAI")
-
-        # # Create a CloudFront distribution
-        # distribution = cloudfront.CloudFrontWebDistribution(
-        #     self, "FrontendDistribution",
-        #     origin_configs=[
-        #         cloudfront.SourceConfiguration(
-        #             s3_origin_source=cloudfront.S3OriginConfig(
-        #                 s3_bucket_source=site_bucket,
-        #                 origin_access_identity=site_oai
-        #             ),
-        #             behaviors=[cloudfront.Behavior(is_default_behavior=True)]
-        #         )
-        #     ]
-        # )
-
-        # # Output the CloudFront domain name
-        # self.cf_domain = distribution.distribution_domain_name
-        # CfnOutput(self, "CloudFrontDomain", value=self.cf_domain)
         
 
