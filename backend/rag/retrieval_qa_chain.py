@@ -11,6 +11,7 @@ from common.custom_vectorstore import CustomPineconeVectorstore, load_existing_i
 from langchain_core.runnables import RunnablePassthrough, RunnableParallel
 from langchain_core.output_parsers import StrOutputParser
 from build_llm_endpoint import build_sagemaker_llm_endpoint
+from langchain_cohere import ChatCohere
 import os
 import logging
 from dotenv import load_dotenv
@@ -22,6 +23,7 @@ logger = logging.getLogger(__name__)
 
 sagemaker_execution_role = os.environ.get("SAGEMAKER_EXECUTION_ROLE")
 llm = build_sagemaker_llm_endpoint(sagemaker_execution_role)
+chat_llm = ChatCohere(model="command", max_tokens="512",  temperature="0.1")
 
 def create_prompt_template():
     """
@@ -73,7 +75,7 @@ contextualize_prompt = ChatPromptTemplate.from_messages(
         ("human", "{question}")
     ]
 )
-contextualize_prompt_chain = contextualize_prompt | llm | StrOutputParser()
+contextualize_prompt_chain = contextualize_prompt | chat_llm | StrOutputParser()
 
 
 def contextualized_prompt(input: dict):
@@ -114,7 +116,7 @@ def create_qa_chain():
             context=contextualized_prompt | retriever | format_docs
         )
         | prompt
-        | llm
+        | chat_llm
     )
 
     return rag_chain
