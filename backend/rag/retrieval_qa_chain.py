@@ -118,7 +118,6 @@ def create_qa_chain():
             context=contextualized_prompt | retriever
         )
         | RunnablePassthrough.assign(context = lambda docs: format_docs(docs["context"]) )
-        | RunnablePassthrough.assign(prompt=prompt)
         | RunnablePassthrough.assign(response = lambda prompt: llm(prompt) )
     )
 
