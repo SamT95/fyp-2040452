@@ -41,8 +41,9 @@ def create_prompt_template():
     Act as a helpful cyber security expert and answer the question below.
     If you do not know the answer to the question, explain that you do not know.
     Use the following pieces of retrieved context to answer the question.
-    Keep the answer concise and informative.
-    Reference the retrieved context in your answer.
+    IMPORTANT! Reference source(s) of the below context in your answer 
+    and directly include the URL of the source(s) in your answer.
+    Put the sources in their own "Sources:" section at the end of your answer.
 
 
     Context: {context}
@@ -114,10 +115,11 @@ def create_qa_chain():
 
     rag_chain = (
         RunnablePassthrough.assign(
-            context=contextualized_prompt | retriever | format_docs
+            context=contextualized_prompt | retriever
         )
-        | prompt
-        | chat_llm
+        | RunnablePassthrough.assign(context = lambda docs: format_docs(docs["context"]) )
+        | RunnablePassthrough.assign(prompt=prompt)
+        | RunnablePassthrough.assign(response = lambda docs: llm(docs["prompt"].messages))
     )
 
     return rag_chain
@@ -149,7 +151,7 @@ def create_qa_chain():
     #     return_source_documents=True,
     # )
 
-    return chain_with_source
+    # return chain_with_source
 
     # The following code can be used to test the chain, however the chain object will be returned and used elsewhere.
     
