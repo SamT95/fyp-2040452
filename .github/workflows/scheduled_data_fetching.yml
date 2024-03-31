@@ -26,5 +26,7 @@ jobs:
             pip install -r backend/requirements.txt
         
         - name: Fetch and Ingest Data
+          env:
+            PYTHONPATH: ${{ github.workspace }}
           run: |
             python backend/scraper_coordinator.py --scrapers cve
