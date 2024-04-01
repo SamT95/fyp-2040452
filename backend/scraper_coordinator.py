@@ -1,5 +1,5 @@
 from backend.scraper.cybok_scraper import CybokScraper
-from backend.scraper.cisa_scraper import CisaScraper
+# from backend.scraper.cisa_scraper import CisaScraper
 from backend.scraper.cve_scraper import CveScraper
 from vectorisation.cohere_embeddings import batch_embeddings
 from vectorisation.pinecone_store import load_pinecone_index
