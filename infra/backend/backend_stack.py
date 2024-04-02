@@ -6,6 +6,8 @@ from aws_cdk import (
     aws_ssm as ssm,
     aws_lambda_python_alpha as _alambda,
     aws_logs as logs,
+    aws_dynamodb as dynamodb,
+    aws_cognito as cognito,
 )
 from constructs import Construct
 
@@ -73,5 +75,58 @@ class BackendStack(Stack):
         ssm.StringParameter(self, "QueryChainAPIURL",
             parameter_name="rag-chain-api-url",
             string_value=self.chain_api.url
+        )
+
+        # Create DynamoDB table to store chat history
+        self.chat_history_table = dynamodb.Table(
+            self, "ChatHistoryTable",
+            partition_key=dynamodb.Attribute(
+                name="user_id",
+                type=dynamodb.AttributeType.STRING
+            ),
+            sort_key=dynamodb.Attribute(
+                name="timestamp",
+                type=dynamodb.AttributeType.STRING
+            ),
+            billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
+        )
+
+        # Create Cognito user pool for authentication
+        self.user_pool = cognito.UserPool(
+            self, "UserPool",
+            self_sign_up_enabled=True,
+            sign_in_aliases=cognito.SignInAliases(
+                email=True,
+                username=True,
+            ),
+            auto_verify=cognito.AutoVerifiedAttrs(
+                email=True
+            ),
+            standard_attributes=cognito.StandardAttributes(
+                email=cognito.StandardAttribute(required=True, mutable=True),
+            ),
+            mfa=cognito.Mfa.OPTIONAL,
+            mfa_second_factor=cognito.MfaSecondFactor(otp=True,),
+            password_policy=cognito.PasswordPolicy(
+                min_length=8,
+                require_digits=True,
+                require_lowercase=True,
+                require_uppercase=True,
+                require_symbols=True,
+            ),
+            account_recovery=cognito.AccountRecovery.EMAIL_ONLY,
+        )
+
+        # Create Cognito user pool client
+        self.user_pool_client = self.user_pool.add_client(
+            "UserPoolClient",
+            generate_secret=False, # Client secret is not needed for our use case
+            auth_flows=cognito.AuthFlow(
+                admin_user_password=True,
+                user_password=True,
+                user_srp=True
+            ),
+            prevent_user_existence_errors=True,
+            
         )
 
