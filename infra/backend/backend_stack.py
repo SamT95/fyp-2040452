@@ -85,7 +85,7 @@ class BackendStack(Stack):
                 type=dynamodb.AttributeType.STRING
             ),
             sort_key=dynamodb.Attribute(
-                name="timestamp",
+                name="conversation_id_timestamp", # Composite sort key with conversation_id and timestamp
                 type=dynamodb.AttributeType.STRING
             ),
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
@@ -106,7 +106,7 @@ class BackendStack(Stack):
                 email=cognito.StandardAttribute(required=True, mutable=True),
             ),
             mfa=cognito.Mfa.OPTIONAL,
-            mfa_second_factor=cognito.MfaSecondFactor(otp=True,),
+            mfa_second_factor=cognito.MfaSecondFactor(otp=True, sms=False),
             password_policy=cognito.PasswordPolicy(
                 min_length=8,
                 require_digits=True,
@@ -127,6 +127,5 @@ class BackendStack(Stack):
                 user_srp=True
             ),
             prevent_user_existence_errors=True,
-            
         )
 
