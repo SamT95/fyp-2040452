@@ -91,7 +91,8 @@ def format_docs(docs):
         logger.info(f"Doc: {doc}")
         logger.info(f"Page content: {doc.page_content}")
         logger.info(f"Metadata: {doc.metadata}")
-    return "\n\n".join([f"{doc.page_content} (Metadata: {doc.metadata})" for doc in docs])
+        logger.info(f"Formatted: {doc.page_content} (Metadata: {doc.metadata})")
+    return "\n\n".join(f"{doc.page_content} (Metadata: {doc.metadata})" for doc in docs)
     
 def create_qa_chain(table_name, session_id, conversation_id):
     """
