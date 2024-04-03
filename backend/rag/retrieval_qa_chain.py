@@ -120,7 +120,7 @@ def create_qa_chain(table_name, session_id, conversation_id):
 
     first_step = RunnablePassthrough.assign(context=context_chain)
 
-    chain = first_step | prompt | llm | StrOutputParser()
+    chain = first_step | prompt | llm
 
     chain_with_history = RunnableWithMessageHistory(
         chain,
