@@ -21,7 +21,8 @@ def deploy_language_model(role):
     # https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1
 
     hub = {
-    	'HF_MODEL_ID':'distilbert/distilgpt2',
+        "HF_MODEL_ID": "mistralai/Mistral-7B-Instruct-v0.1",
+        "SM_NUM_GPUS": json.dumps(1),      
     }
     
     huggingface_model = HuggingFaceModel(
@@ -30,20 +31,15 @@ def deploy_language_model(role):
     	role=role, 
     )
 
-    # Set up AWS Serverless Inference Config (https://sagemaker.readthedocs.io/en/stable/overview.html#sagemaker-serverless-inference)
-
-    serverless_config = ServerlessInferenceConfig(
-      memory_size_in_mb=6144,
-      max_concurrency=2,
-    )
-
     endpoint_name="huggingface-rag-llm-endpoint"
 
     # deploy model to SageMaker Inference
     predictor = huggingface_model.deploy(
-      endpoint_name=endpoint_name,
-      serverless_inference_config=serverless_config,
-      )
+        initial_instance_count=1,
+        instance_type="ml.g5.2xlarge",
+        endpoint_name=endpoint_name,
+        container_startup_health_check_timeout=300,
+    )
     
     endpoint_name = predictor.endpoint_name
     print(endpoint_name, file=sys.stdout)
