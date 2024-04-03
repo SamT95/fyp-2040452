@@ -35,8 +35,8 @@ def lambda_handler(event, context):
     # Retrieve chat history from DynamoDB
 
     dynamo_db_key = {
-        "session_id": user_id,
-        "conversation_id": conversation_id
+        "user_id": user_id,
+        "conversation_id_timestamp": conversation_id
     }
 
     chat_history = DynamoDBChatMessageHistory(
