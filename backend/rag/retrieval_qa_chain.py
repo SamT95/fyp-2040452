@@ -123,8 +123,13 @@ def create_qa_chain(table_name, session_id, conversation_id):
 
     chain = first_step | prompt | llm
 
+    final_chain = RunnableParallel({
+        "context": context_chain,
+        "answer": chain,
+    })
+
     chain_with_history = RunnableWithMessageHistory(
-        chain,
+        final_chain,
         lambda session_id: DynamoDBChatMessageHistory(
             table_name=table_name,
             session_id=session_id,
