@@ -14,6 +14,7 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_community.chat_message_histories import DynamoDBChatMessageHistory
 from build_llm_endpoint import build_sagemaker_llm_endpoint
 from langchain_cohere import ChatCohere
+from operator import itemgetter
 import os
 import logging
 from dotenv import load_dotenv
@@ -110,7 +111,7 @@ def create_qa_chain(table_name, session_id):
     retriever = vectorstore.as_retriever(search_kwargs={"k": 2})
     prompt = create_prompt_template()
 
-    context_chain = prompt | retriever | format_docs
+    context_chain = itemgetter("question") | retriever | format_docs
 
     first_step = RunnablePassthrough.assign(context=context_chain)
 
