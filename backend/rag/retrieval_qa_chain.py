@@ -93,7 +93,7 @@ def format_docs(docs):
         logger.info(f"Metadata: {doc.metadata}")
     return "\n\n".join([f"{doc.page_content} (Metadata: {doc.metadata})" for doc in docs])
     
-def create_qa_chain(table_name, session_id):
+def create_qa_chain(table_name, session_id, conversation_id):
     """
     This function generates the retrieval QA chain.
     The chain is built using Langchain.
@@ -111,6 +111,11 @@ def create_qa_chain(table_name, session_id):
     retriever = vectorstore.as_retriever(search_kwargs={"k": 2})
     prompt = create_prompt_template()
 
+    dynamo_db_key = {
+        "session_id": session_id,
+        "conversation_id": conversation_id
+    }
+
     context_chain = itemgetter("question") | retriever | format_docs
 
     first_step = RunnablePassthrough.assign(context=context_chain)
@@ -121,7 +126,8 @@ def create_qa_chain(table_name, session_id):
         chain,
         lambda session_id: DynamoDBChatMessageHistory(
             table_name=table_name,
-            session_id=session_id
+            session_id=session_id,
+            key=dynamo_db_key
         ),
         input_messages_key="question",
         history_messages_key="chat_history",
