@@ -112,8 +112,8 @@ def create_qa_chain(table_name, session_id, conversation_id):
     prompt = create_prompt_template()
 
     dynamo_db_key = {
-        "session_id": session_id,
-        "conversation_id": conversation_id
+        "user_id": session_id,
+        "conversation_id_timestamp": conversation_id
     }
 
     context_chain = itemgetter("question") | retriever | format_docs
