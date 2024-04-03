@@ -15,10 +15,21 @@ class BackendStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
+        # Define lambda function to query the RAG model
         self.qa_chain_lambda = _alambda.PythonFunction(
             self,
             "QueryChain",
             entry="../backend/rag",
+            index="lambda_handler.py",
+            handler="lambda_handler",
+            runtime=_lambda.Runtime.PYTHON_3_10,
+        )
+
+        # Define lambda function to query DynamoDB for chat history
+        self.chat_history_lambda = _alambda.PythonFunction(
+            self,
+            "ChatHistory",
+            entry="../backend/chat_history",
             index="lambda_handler.py",
             handler="lambda_handler",
             runtime=_lambda.Runtime.PYTHON_3_10,
@@ -38,6 +49,7 @@ class BackendStack(Stack):
             resources=["arn:aws:sagemaker:*:*:endpoint/*"]
         )
 
+        # Define policy statement to allow lambda to access S3 bucket
         s3_policy = iam.PolicyStatement(
             actions=["s3:*"],
             effect=iam.Effect.ALLOW,
@@ -47,6 +59,7 @@ class BackendStack(Stack):
                 ]
         )
 
+        # Attach policy statements to RAG chain lambda role
         self.qa_chain_lambda.role.add_to_policy(secrets_manager_policy)
         self.qa_chain_lambda.role.add_to_policy(sagemaker_policy)
         self.qa_chain_lambda.role.add_to_policy(s3_policy)
@@ -56,7 +69,7 @@ class BackendStack(Stack):
             log_group_name="/aws/api-gateway/rag-chain-api"
         )
 
-        # Define REST API gateway
+        # Define REST API gateway for querying the RAG model
         self.chain_api = apigw.LambdaRestApi(
             self, "QueryChainAPI",
             handler=self.qa_chain_lambda,
@@ -67,9 +80,17 @@ class BackendStack(Stack):
                 access_log_format=apigw.AccessLogFormat.clf(),
             )
         )
-
         query_resource = self.chain_api.root.add_resource("query")
         query_resource.add_method("POST") 
+
+        # Define REST API gateway for querying chat history
+        self.chat_history_api = apigw.LambdaRestApi(
+            self, "ChatHistoryAPI",
+            handler=self.chat_history_lambda,
+            proxy=False,
+        )
+        chat_history_resource = self.chat_history_api.root.add_resource("chat_history")
+        chat_history_resource.add_method("GET")
 
         # Store API URL in SSM
         ssm.StringParameter(self, "QueryChainAPIURL",
@@ -90,6 +111,16 @@ class BackendStack(Stack):
             ),
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
         )
+
+        # Grant chat history lambda permission to read the chat history table
+        self.chat_history_table.grant_read_data(self.chat_history_lambda)
+
+        # Grant rag chain lambda permission to write to the chat history table
+        self.chat_history_table.grant_write_data(self.qa_chain_lambda)
+
+        # Add environment variables to the lambda functions
+        self.qa_chain_lambda.add_environment("TABLE_NAME", self.chat_history_table.table_name)
+        self.chat_history_lambda.add_environment("TABLE_NAME", self.chat_history_table.table_name)
 
         # Create Cognito user pool for authentication
         self.user_pool = cognito.UserPool(
