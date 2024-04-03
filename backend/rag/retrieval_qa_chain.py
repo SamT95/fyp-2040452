@@ -8,8 +8,9 @@ from langchain.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceh
 from common.custom_embeddings import CustomCohereEmbeddings
 from common.fetch_keys import fetch_cohere_key
 from common.custom_vectorstore import CustomPineconeVectorstore, load_existing_index
-from langchain_core.runnables import RunnablePassthrough, RunnableParallel
+from langchain_core.runnables import RunnablePassthrough, RunnableParallel, RunnableWithMessageHistory
 from langchain_core.output_parsers import StrOutputParser
+from langchain_community.chat_message_histories import DynamoDBChatMessageHistory
 from build_llm_endpoint import build_sagemaker_llm_endpoint
 from langchain_cohere import ChatCohere
 import os
@@ -41,10 +42,6 @@ def create_prompt_template():
     Act as a helpful cyber security expert and answer the question below.
     If you do not know the answer to the question, explain that you do not know.
     Use the following pieces of retrieved context to answer the question.
-    IMPORTANT! Reference source(s) of the below context in your answer 
-    and directly include the URL of the source(s) in your answer.
-    Put the sources in their own "Sources:" section at the end of your answer.
-
 
     Context: {context}
     """
@@ -94,7 +91,7 @@ def format_docs(docs):
         logger.info(f"Metadata: {doc.metadata}")
     return "\n\n".join([f"{doc.page_content} (Metadata: {doc.metadata})" for doc in docs])
     
-def create_qa_chain():
+def create_qa_chain(table_name, session_id):
     """
     This function generates the retrieval QA chain.
     The chain is built using Langchain.
@@ -111,17 +108,34 @@ def create_qa_chain():
     vectorstore = CustomPineconeVectorstore(pinecone_index, embeddings, text_field)
     retriever = vectorstore.as_retriever(search_kwargs={"k": 2})
     prompt = create_prompt_template()
-    # handler = StdOutCallbackHandler() # Initialise an output callback handler for streaming
 
-    rag_chain = (
-        RunnablePassthrough.assign(
-            context=contextualized_prompt | retriever
-        )
-        | RunnablePassthrough.assign(context = lambda docs: format_docs(docs["context"]) )
-        | RunnablePassthrough.assign(response = lambda prompt: llm(prompt) )
+    context_chain = prompt | retriever | format_docs
+
+    first_step = RunnablePassthrough.assign(context=context_chain)
+
+    chain = first_step | prompt | llm | StrOutputParser()
+
+    chain_with_history = RunnableWithMessageHistory(
+        chain,
+        lambda session_id: DynamoDBChatMessageHistory(
+            table_name=table_name,
+            session_id=session_id
+        ),
+        input_messages_key="question",
+        history_messages_key="chat_history",
     )
 
-    return rag_chain
+    return chain_with_history
+
+    # rag_chain = (
+    #     RunnablePassthrough.assign(
+    #         context=contextualized_prompt | retriever
+    #     )
+    #     | RunnablePassthrough.assign(context = lambda docs: format_docs(docs["context"]) )
+    #     | RunnablePassthrough.assign(response = lambda prompt: chat_llm(prompt) )
+    # )
+
+    # return rag_chain
 
     # chain_from_docs = (
     #     RunnablePassthrough.assign(context=(lambda docs: format_docs(docs["context"])))
