@@ -13,7 +13,6 @@ logger.setLevel(logging.INFO)
 # Initialize QA chain outside handler to leverage container reuse
 #https://aws.amazon.com/blogs/compute/container-reuse-in-lambda/
 table_name = os.environ["TABLE_NAME"]
-chain = create_qa_chain(table_name=table_name)
 
 
 def lambda_handler(event, context):
@@ -29,6 +28,9 @@ def lambda_handler(event, context):
             "statusCode": 400,
             "body": json.dumps({"error": "Query parameter not found in request body"})
         }
+    
+    # Initialize the QA chain
+    chain = create_qa_chain(table_name=table_name, session_id=user_id)
     
     # Retrieve chat history from DynamoDB
     chat_history = DynamoDBChatMessageHistory(table_name=table_name, session_id=user_id)
