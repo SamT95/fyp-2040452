@@ -8,7 +8,8 @@ from langchain.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceh
 from common.custom_embeddings import CustomCohereEmbeddings
 from common.fetch_keys import fetch_cohere_key
 from common.custom_vectorstore import CustomPineconeVectorstore, load_existing_index
-from langchain_core.runnables import RunnablePassthrough, RunnableParallel, RunnableWithMessageHistory
+from langchain_core.runnables import RunnablePassthrough, RunnableParallel
+from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.output_parsers import StrOutputParser
 from langchain_community.chat_message_histories import DynamoDBChatMessageHistory
 from build_llm_endpoint import build_sagemaker_llm_endpoint
