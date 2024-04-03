@@ -30,10 +30,20 @@ def lambda_handler(event, context):
         }
     
     # Initialize the QA chain
-    chain = create_qa_chain(table_name=table_name, session_id=user_id)
+    chain = create_qa_chain(table_name=table_name, session_id=user_id, conversation_id=conversation_id)
     
     # Retrieve chat history from DynamoDB
-    chat_history = DynamoDBChatMessageHistory(table_name=table_name, session_id=user_id)
+
+    dynamo_db_key = {
+        "session_id": user_id,
+        "conversation_id": conversation_id
+    }
+
+    chat_history = DynamoDBChatMessageHistory(
+        table_name=table_name,
+        session_id=user_id,
+        key=dynamo_db_key
+    )
 
     logger.info(f"Chat history: {chat_history}")
     logger.info(f"Conversation ID: {conversation_id}")
