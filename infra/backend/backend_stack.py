@@ -115,8 +115,8 @@ class BackendStack(Stack):
         # Grant chat history lambda permission to read the chat history table
         self.chat_history_table.grant_read_data(self.chat_history_lambda)
 
-        # Grant rag chain lambda permission to write to the chat history table
-        self.chat_history_table.grant_write_data(self.qa_chain_lambda)
+        # Grant rag chain lambda permission to read and write the chat history table
+        self.chat_history_table.grant_read_write_data(self.qa_chain_lambda)
 
         # Add environment variables to the lambda functions
         self.qa_chain_lambda.add_environment("TABLE_NAME", self.chat_history_table.table_name)
