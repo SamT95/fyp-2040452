@@ -124,8 +124,8 @@ def create_qa_chain(table_name, session_id, conversation_id):
     chain = prompt | llm
 
     chain_with_context = {
+        "question": RunnablePassthrough(),
         "context": retriever | format_docs,
-        "question": RunnablePassthrough()
     } | RunnablePassthrough.assign(answer=chain)
 
     # final_chain = RunnablePassthrough.assign(answer=chain, source_documents=context_chain)
