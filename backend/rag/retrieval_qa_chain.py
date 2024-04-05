@@ -8,7 +8,7 @@ from langchain.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceh
 from common.custom_embeddings import CustomCohereEmbeddings
 from common.fetch_keys import fetch_cohere_key
 from common.custom_vectorstore import CustomPineconeVectorstore, load_existing_index
-from langchain_core.runnables import RunnablePassthrough, RunnableParallel
+from langchain_core.runnables import RunnablePassthrough, RunnableParallel, Runnable
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.output_parsers import StrOutputParser
 from langchain_community.chat_message_histories import DynamoDBChatMessageHistory
@@ -117,21 +117,33 @@ def create_qa_chain(table_name, session_id, conversation_id):
         "conversation_id_timestamp": conversation_id
     }
 
-    # context_chain = itemgetter("question") | retriever | format_docs
+    class CustomRunnable(Runnable):
+        async def invoke(self, input):
+            context = input["context"]
+            question = input["question"]
+            llm_output = prompt | llm
+            return {
+                "context": context,
+                "question": question,
+                "answer": llm_output
+            }
+            
+
+    context_chain = itemgetter("question") | retriever | format_docs
 
     # first_step = RunnablePassthrough.assign(context=context_chain)
 
-    chain = prompt | llm
+    passthrough_with_context = RunnablePassthrough.assign(
+        context=context_chain,
+        question=itemgetter("question")
+    )
 
-    chain_with_context = {
-        "question": RunnablePassthrough(),
-        "context": retriever | format_docs,
-    } | RunnablePassthrough.assign(answer=chain)
+    chain = passthrough_with_context | CustomRunnable()
 
     # final_chain = RunnablePassthrough.assign(answer=chain, source_documents=context_chain)
 
     chain_with_history = RunnableWithMessageHistory(
-        chain_with_context,
+        chain,
         lambda session_id: DynamoDBChatMessageHistory(
             table_name=table_name,
             session_id=session_id,
