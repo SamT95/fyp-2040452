@@ -152,6 +152,7 @@ def create_qa_chain(table_name, session_id, conversation_id):
         ),
         input_messages_key="question",
         history_messages_key="chat_history",
+        output_messages_key="answer"
     )
 
     return chain_with_history
