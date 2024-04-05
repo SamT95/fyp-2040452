@@ -132,19 +132,23 @@ def create_qa_chain(table_name, session_id, conversation_id):
 
     context_chain = itemgetter("question") | retriever | format_docs
 
-    # first_step = RunnablePassthrough.assign(context=context_chain)
+    first_step = RunnablePassthrough.assign(context=context_chain)
 
     passthrough_with_context = RunnablePassthrough.assign(
         context=context_chain,
         question=itemgetter("question")
     )
 
-    chain = passthrough_with_context | CustomRunnable()
+    chain = prompt | llm 
 
+    final_chain = {
+        "context": retriever | format_docs,
+        "question": RunnablePassthrough(),
+    } | RunnablePassthrough.assign(answer=chain)
     # final_chain = RunnablePassthrough.assign(answer=chain, source_documents=context_chain)
 
     chain_with_history = RunnableWithMessageHistory(
-        chain,
+        final_chain,
         lambda session_id: DynamoDBChatMessageHistory(
             table_name=table_name,
             session_id=session_id,
