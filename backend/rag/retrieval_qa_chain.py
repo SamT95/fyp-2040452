@@ -8,13 +8,14 @@ from langchain.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceh
 from common.custom_embeddings import CustomCohereEmbeddings
 from common.fetch_keys import fetch_cohere_key
 from common.custom_vectorstore import CustomPineconeVectorstore, load_existing_index
-from langchain_core.runnables import RunnablePassthrough, RunnableParallel, Runnable
+from langchain_core.runnables import RunnablePassthrough, RunnableParallel, Runnable, RunnableConfig
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.output_parsers import StrOutputParser
 from langchain_community.chat_message_histories import DynamoDBChatMessageHistory
 from build_llm_endpoint import build_sagemaker_llm_endpoint
 from langchain_cohere import ChatCohere
 from operator import itemgetter
+from typing import Any, Optional
 import os
 import logging
 from dotenv import load_dotenv
@@ -118,7 +119,7 @@ def create_qa_chain(table_name, session_id, conversation_id):
     }
 
     class CustomRunnable(Runnable):
-        async def invoke(self, input):
+        async def invoke(self, input: Any, config: Optional[RunnableConfig] = None) -> dict:
             context = input["context"]
             question = input["question"]
             llm_output = prompt | llm
