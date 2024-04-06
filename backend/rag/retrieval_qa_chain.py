@@ -54,7 +54,7 @@ def create_prompt_template():
         [
             ("system", prompt_template),
             MessagesPlaceholder(variable_name="chat_history"),
-            ("human", "{question}"),
+            ("human", "{input}"),
         ]
     )
 
@@ -116,7 +116,7 @@ def create_qa_chain(table_name, session_id, conversation_id):
         [
             ("system", contextualize_question_prompt),
             MessagesPlaceholder(variable_name="chat_history"),
-            ("human", "{question}")
+            ("human", "{input}")
         ]
     )
     context_aware_retriever = create_history_aware_retriever(
@@ -159,7 +159,7 @@ def create_qa_chain(table_name, session_id, conversation_id):
             session_id=session_id,
             key=dynamo_db_key
         ),
-        input_messages_key="question",
+        input_messages_key="input",
         history_messages_key="chat_history",
         output_messages_key="answer"
     )
