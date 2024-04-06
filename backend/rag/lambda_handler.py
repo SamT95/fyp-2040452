@@ -50,7 +50,7 @@ def lambda_handler(event, context):
 
     # Initialize and run the QA chain
     output = chain.invoke(
-        {"question": query},
+        {"input": query},
         config={"configurable": {"session_id": user_id}},
     )
     logger.info(f"Output: {output}")
