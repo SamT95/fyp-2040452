@@ -54,11 +54,10 @@ def lambda_handler(event, context):
         config={"configurable": {"session_id": user_id}},
     )
     logger.info(f"Output: {output}")
-    answer = output["content"]
-        
-
-    source_documents = [{"text": doc.page_content, "metadata": doc.metadata} for doc in context]
-    logger.info(f"Source documents: {source_documents}")
+    answer = output["answer"]
+    context = output["context"]
+    logger.info(f"Answer: {answer}")
+    logger.info(f"Context: {context}")
 
 
     # Return the QA chain response
@@ -66,7 +65,7 @@ def lambda_handler(event, context):
         "statusCode": 200,
         "body": json.dumps({
             "result": answer,
-            "source_documents": source_documents
+            "source_documents": context,
         }),
         "headers": {
             "Content-Type": "application/json"
