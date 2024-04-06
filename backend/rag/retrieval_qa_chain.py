@@ -3,7 +3,8 @@
 # The Pinecone vectorstore is used as a retriever and Cohere is used as an embedding model
 # The chain handles the embedding of the user's question, the retrieval of the most similar document, and the answering of the question.
 
-from langchain.chains import RetrievalQA
+from langchain.chains import create_retrieval_chain, create_history_aware_retriever
+from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder
 from common.custom_embeddings import CustomCohereEmbeddings
 from common.fetch_keys import fetch_cohere_key
@@ -66,19 +67,7 @@ def create_prompt_template():
 
 
 
-system_prompt = """
-Given a conversation history and the latest human user question, which might reference context
-in the conversation history, create a standalone question which can be answered without the chat history.
-DO NOT answer the question, just reformulate it if needed, or return it as is.
-"""
-contextualize_prompt = ChatPromptTemplate.from_messages(
-    [
-        ("system", system_prompt),
-        MessagesPlaceholder(variable_name="chat_history"),
-        ("human", "{question}")
-    ]
-)
-contextualize_prompt_chain = contextualize_prompt | chat_llm | StrOutputParser()
+
 
 
 def contextualized_prompt(input: dict):
@@ -118,36 +107,37 @@ def create_qa_chain(table_name, session_id, conversation_id):
         "conversation_id_timestamp": conversation_id
     }
 
-    class CustomRunnable(Runnable):
-        async def invoke(self, input: Any, config: Optional[RunnableConfig] = None) -> dict:
-            context = input["context"]
-            question = input["question"]
-            llm_output = prompt | llm
-            return {
-                "context": context,
-                "question": question,
-                "answer": llm_output
-            }
-            
-
-    context_chain = itemgetter("question") | retriever | format_docs
-
-    first_step = RunnablePassthrough.assign(context=context_chain)
-
-    passthrough_with_context = RunnablePassthrough.assign(
-        context=context_chain,
-        question=itemgetter("question")
+    contextualize_question_prompt = """
+    Given a conversation history and the latest human user question, which might reference context
+    in the conversation history, create a standalone question which can be answered without the chat history.
+    DO NOT answer the question, just reformulate it if needed, or return it as is.
+    """
+    contextualize_prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", contextualize_question_prompt),
+            MessagesPlaceholder(variable_name="chat_history"),
+            ("human", "{question}")
+        ]
+    )
+    context_aware_retriever = create_history_aware_retriever(
+        llm,
+        retriever,
+        contextualize_prompt,
     )
 
-    chain = ({
-        "context": itemgetter("question") | retriever | format_docs,
-        "question": itemgetter("question"),
-        "chat_history": itemgetter("chat_history")
-    } | RunnableParallel({
-        "answer": prompt | llm,
-        "context": itemgetter("context")
-    })
-    )
+    qa_chain = create_stuff_documents_chain(llm, prompt)
+
+    rag_chain = create_retrieval_chain(context_aware_retriever, qa_chain)
+
+    # chain = ({
+    #     "context": itemgetter("question") | retriever | format_docs,
+    #     "question": itemgetter("question"),
+    #     "chat_history": itemgetter("chat_history")
+    # } | RunnableParallel({
+    #     "answer": prompt | llm,
+    #     "context": itemgetter("context")
+    # })
+    # )
 
     # chain = first_step | prompt | llm 
 
@@ -163,7 +153,7 @@ def create_qa_chain(table_name, session_id, conversation_id):
     # final_chain = RunnablePassthrough.assign(answer=chain, source_documents=context_chain)
 
     chain_with_history = RunnableWithMessageHistory(
-        chain,
+        rag_chain,
         lambda session_id: DynamoDBChatMessageHistory(
             table_name=table_name,
             session_id=session_id,
