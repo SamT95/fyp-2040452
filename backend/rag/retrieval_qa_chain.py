@@ -139,12 +139,17 @@ def create_qa_chain(table_name, session_id, conversation_id):
         question=itemgetter("question")
     )
 
-    chain = prompt | llm 
+    chain = first_step | prompt | llm 
 
-    final_chain = {
-        "context": retriever | format_docs,
-        "question": RunnablePassthrough(),
-    } | RunnablePassthrough.assign(answer=chain)
+    final_chain = RunnableParallel({
+        "answer": chain,
+        "context": itemgetter("context")
+    })
+
+    # final_chain = {
+    #     "context": retriever | format_docs,
+    #     "question": RunnablePassthrough(),
+    # } | RunnablePassthrough.assign(answer=chain)
     # final_chain = RunnablePassthrough.assign(answer=chain, source_documents=context_chain)
 
     chain_with_history = RunnableWithMessageHistory(
