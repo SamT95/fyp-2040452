@@ -141,7 +141,7 @@ def create_qa_chain(table_name, session_id, conversation_id):
 
     chain = ({
         "context": itemgetter("question") | retriever | format_docs,
-        "question": itemgetter("question")
+        "question": itemgetter("question"),
         "chat_history": itemgetter("chat_history")
     } | RunnableParallel({
         "answer": prompt | llm,
