@@ -3,11 +3,10 @@ import json
 from boto3.dynamodb.conditions import Key
 import os
 
-table_name = os.environ["TABLE_NAME"]
-dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table(table_name)
-
 def lambda_handler(event, context):
+    table_name = os.environ["TABLE_NAME"]
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table(table_name)
     # Extract user ID and conversation ID from query string parameters
     try:
         user_id = event["queryStringParameters"]["user_id"]
