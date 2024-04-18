@@ -6,46 +6,8 @@
   margin: 0 auto;
 }
 
-/* Aligns the form in the center of the page */
-.formContainer {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column; /* Align items vertically */
-  margin-bottom: 1em;
+@media only screen and (max-width: 600px) {
+  .contentWrapper {
+    padding: 0 0.5em;
+  }
 }
-
-/* Styles for the form to align items horizontally */
-.form {
-  display: flex;
-  gap: 20px; /* Gap between textarea and button */
-  width: 100%;
-}
-
-.textarea {
-  width: 80%;
-  min-width: 500px; /* Minimum width of 300px */
-  background-color: #e8f0fe; /* Light blue background */
-  /* background-color: #333 */
-  padding: 1em;
-  border: none;
-  border-radius: 4px;
-  resize: none; /* Optional: Prevents resizing */
-  /* box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px; */
-
-}
-
-.button {
-  width: 20%;
-  min-width: 100px; /* Minimum width of 100px */
-  padding: 1em;
-  border: none;
-  cursor: pointer;
-  border-radius: 4px;
-  background-color: #007BFF; /* Example button color */
-  color: white;
-  /* box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px; */
-  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-
-}
-
