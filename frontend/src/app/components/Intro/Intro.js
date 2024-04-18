@@ -71,7 +71,7 @@ export default function Intro() {
                         </li>
                     ))}
                 </ul>
-                <p>These sources provide context for the chatbot's answers, however they are not all-encompassing</p>
+                <p>These sources provide context for the chatbot&apos;s answers, however they are not all-encompassing</p>
                 <p>Additional sources of information and guidance are outlined below:</p>
                 <ul role="list" className={styles.sourcesList}>
                     {additionalSourcesAndLinks.map((source, index) => (
