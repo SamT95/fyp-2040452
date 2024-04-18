@@ -31,3 +31,4 @@ jobs:
           python backend/deployment/deploy_llm.py
         env:
           SAGEMAKER_EXECUTION_ROLE: ${{ secrets.SAGEMAKER_EXECUTION_ROLE }}
+          HUGGING_FACE_HUB_TOKEN: ${{ secrets.HUGGING_FACE_HUB_TOKEN }}
