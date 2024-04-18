@@ -4,12 +4,15 @@ import axios from "axios";
 
 export async function POST(req) {
     // Pull the message from the request body
-    const { message } = await req.json();
+    const { message, conversation_id, user_id } = await req.json();
     // Send the message to the backend API and get a response
     try {
-        const response = await axios.post(`${process.env.CHAIN_API_URL}query`, { 
-            query: message
-         }, {
+        const response = await axios.post(`${process.env.CHAIN_API_URL}/query`, { 
+            query: message,
+            conversation_id,
+            user_id,
+            }, 
+            {
             headers: {
                 "Content-Type": "application/json",
             },
