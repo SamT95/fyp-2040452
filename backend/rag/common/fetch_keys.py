@@ -57,3 +57,28 @@ def fetch_pinecone_key():
     # Extract PINECONE_API_KEY key from json object
     key = secret["PINECONE_API_KEY"]
     return key
+
+def fetch_key(secret_name, key_name):
+    """
+    This function fetches the specified key from AWS Secrets Manager.
+    """
+
+    # Create a Secrets Manager client
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name="eu-west-1"
+    )
+
+    try:
+        get_secret_value_response = client.get_secret_value(
+            SecretId=secret_name
+        )
+    except ClientError as e:
+        raise e
+
+    secret = get_secret_value_response['SecretString']
+    secret = json.loads(secret)
+    # Extract key from json object
+    key = secret[key_name]
+    return key
