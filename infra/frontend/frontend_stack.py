@@ -98,14 +98,15 @@ class FrontendStack(Stack):
                             actions=["sagemaker:DescribeEndpoint"],
                             resources=["arn:aws:sagemaker:eu-west-1:349382198749:endpoint/huggingface-rag-llm-endpoint"],
                         ),
-                        # Cognito permissions
-                        iam.ManagedPolicy.from_aws_managed_policy_name(
-                            "AmazonCognitoPowerUser"
-                        )
                     ]
                 )
             },
             assumed_by=iam.ServicePrincipal("ecs-tasks.amazonaws.com")
+        )
+
+        # Add Cognito managed policy to task role
+        task_role.add_managed_policy(
+            iam.ManagedPolicy.from_aws_managed_policy_name("AmazonCognitoPowerUser")
         )
 
         # Connect to 'frontend' ECR repository
