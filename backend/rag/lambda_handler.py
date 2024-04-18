@@ -6,16 +6,11 @@ import logging
 import os
 
 # Set up logging
-
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-# Initialize QA chain outside handler to leverage container reuse
-#https://aws.amazon.com/blogs/compute/container-reuse-in-lambda/
-table_name = os.environ["TABLE_NAME"]
-
-
 def lambda_handler(event, context):
+    table_name = os.environ["TABLE_NAME"]
     # Extract query from API Gateway event
     logger.info(f"Event: {event}")
     try:
@@ -26,7 +21,7 @@ def lambda_handler(event, context):
     except KeyError:
         return {
             "statusCode": 400,
-            "body": json.dumps({"error": "Query parameter not found in request body"})
+            "body": json.dumps({"error": "Parameters missing from request body"})
         }
     
     # Initialize the QA chain
@@ -58,6 +53,11 @@ def lambda_handler(event, context):
     context = output["context"]
     logger.info(f"Answer: {answer}")
     logger.info(f"Context: {context}")
+    formatted_context = []
+    for item in context:
+        formatted_context.append({
+            "metadata": item.metadata,
+        })
 
 
     # Return the QA chain response
@@ -65,7 +65,7 @@ def lambda_handler(event, context):
         "statusCode": 200,
         "body": json.dumps({
             "result": answer,
-            "source_documents": context,
+            "source_documents": formatted_context,
         }),
         "headers": {
             "Content-Type": "application/json"
