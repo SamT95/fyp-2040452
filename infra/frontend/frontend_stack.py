@@ -82,6 +82,7 @@ class FrontendStack(Stack):
             inline_policies={
                 "ECRAndSageMakerAccess": iam.PolicyDocument(
                     statements=[
+                        # ECR image pull permissions
                         iam.PolicyStatement(
                             actions=[
                                 "ecr:GetAuthorizationToken",
@@ -92,10 +93,15 @@ class FrontendStack(Stack):
                             ],
                             resources=["*"]
                         ),
+                        # SageMaker endpoint permissions
                         iam.PolicyStatement(
                             actions=["sagemaker:DescribeEndpoint"],
                             resources=["arn:aws:sagemaker:eu-west-1:349382198749:endpoint/huggingface-rag-llm-endpoint"],
                         ),
+                        # Cognito permissions
+                        iam.ManagedPolicy.from_aws_managed_policy_name(
+                            "AmazonCognitoPowerUser"
+                        )
                     ]
                 )
             },
