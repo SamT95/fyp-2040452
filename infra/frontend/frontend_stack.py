@@ -164,7 +164,8 @@ class FrontendStack(Stack):
                 "CHAIN_API_URL": rag_chain_api_url,
                 "HISTORY_API_URL": chat_history_api_url,
                 "COGNITO_USER_POOL_ID": cognito_user_pool_id,
-                "COGNITO_APP_CLIENT_ID": cognito_user_pool_client_id
+                "COGNITO_APP_CLIENT_ID": cognito_user_pool_client_id,
+                "URL": "https://up2040452-fyp.com"
             },
             logging=ecs.LogDrivers.aws_logs(
                 stream_prefix="frontend",
