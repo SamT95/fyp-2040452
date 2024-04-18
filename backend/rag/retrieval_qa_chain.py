@@ -5,18 +5,13 @@
 
 from langchain.chains import create_retrieval_chain, create_history_aware_retriever
 from langchain.chains.combine_documents import create_stuff_documents_chain
-from langchain.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder
+from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 from common.custom_embeddings import CustomCohereEmbeddings
-from common.fetch_keys import fetch_cohere_key
+from common.fetch_keys import fetch_cohere_key, fetch_key
 from common.custom_vectorstore import CustomPineconeVectorstore, load_existing_index
-from langchain_core.runnables import RunnablePassthrough, RunnableParallel, Runnable, RunnableConfig
 from langchain_core.runnables.history import RunnableWithMessageHistory
-from langchain_core.output_parsers import StrOutputParser
 from langchain_community.chat_message_histories import DynamoDBChatMessageHistory
 from build_llm_endpoint import build_sagemaker_llm_endpoint
-from langchain_cohere import ChatCohere
-from operator import itemgetter
-from typing import Any, Optional
 import os
 import logging
 from dotenv import load_dotenv
@@ -25,11 +20,13 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-cohere_api_key = fetch_cohere_key()
+cohere_api_key = fetch_key("rag/CohereKeyProd", "COHERE_API_KEY")
 os.environ["COHERE_API_KEY"] = cohere_api_key
+langsmith_api_key = fetch_key("rag/LangsmithKey", "LANGSMITH_API_KEY")
+os.environ["LANGSMITH_API_KEY"] = langsmith_api_key
+os.environ["LANGCHAIN_TRACING_V2"] = "true"
 sagemaker_execution_role = os.environ.get("SAGEMAKER_EXECUTION_ROLE")
 llm = build_sagemaker_llm_endpoint(sagemaker_execution_role)
-chat_llm = ChatCohere(model="command", max_tokens="512",  temperature="0.1")
 
 def create_prompt_template():
     """
@@ -58,23 +55,8 @@ def create_prompt_template():
         ]
     )
 
-    # prompt = PromptTemplate(
-    #     template=prompt_template,
-    #     input_variables=["context", "question"],
-    # )
-
     return system_prompt
 
-
-
-
-
-
-def contextualized_prompt(input: dict):
-    if "chat_history" in input:
-        return contextualize_prompt_chain
-    else:
-        return input["question"]
 
 def format_docs(docs):
     for doc in docs:
@@ -94,7 +76,6 @@ def create_qa_chain(table_name, session_id, conversation_id):
         model="embed-english-v3.0",
         cohere_api_key=cohere_api_key,
     )
-
     index_name = "rag-index"
     pinecone_index = load_existing_index(index_name)
     text_field = "text"
@@ -108,7 +89,7 @@ def create_qa_chain(table_name, session_id, conversation_id):
     }
 
     contextualize_question_prompt = """
-    Given a conversation history and the latest human user question, which might reference context
+    Given a conversation history and the latest human user question, which might reference content
     in the conversation history, create a standalone question which can be answered without the chat history.
     DO NOT answer the question, just reformulate it if needed, or return it as is.
     """
@@ -129,29 +110,6 @@ def create_qa_chain(table_name, session_id, conversation_id):
 
     rag_chain = create_retrieval_chain(context_aware_retriever, qa_chain)
 
-    # chain = ({
-    #     "context": itemgetter("question") | retriever | format_docs,
-    #     "question": itemgetter("question"),
-    #     "chat_history": itemgetter("chat_history")
-    # } | RunnableParallel({
-    #     "answer": prompt | llm,
-    #     "context": itemgetter("context")
-    # })
-    # )
-
-    # chain = first_step | prompt | llm 
-
-    # final_chain = RunnableParallel({
-    #     "answer": chain,
-    #     "context": itemgetter("context")
-    # })
-
-    # final_chain = {
-    #     "context": retriever | format_docs,
-    #     "question": RunnablePassthrough(),
-    # } | RunnablePassthrough.assign(answer=chain)
-    # final_chain = RunnablePassthrough.assign(answer=chain, source_documents=context_chain)
-
     chain_with_history = RunnableWithMessageHistory(
         rag_chain,
         lambda session_id: DynamoDBChatMessageHistory(
@@ -165,50 +123,3 @@ def create_qa_chain(table_name, session_id, conversation_id):
     )
 
     return chain_with_history
-
-    # rag_chain = (
-    #     RunnablePassthrough.assign(
-    #         context=contextualized_prompt | retriever
-    #     )
-    #     | RunnablePassthrough.assign(context = lambda docs: format_docs(docs["context"]) )
-    #     | RunnablePassthrough.assign(response = lambda prompt: chat_llm(prompt) )
-    # )
-
-    # return rag_chain
-
-    # chain_from_docs = (
-    #     RunnablePassthrough.assign(context=(lambda docs: format_docs(docs["context"])))
-    #     | prompt
-    #     | llm
-    #     | StrOutputParser()
-    # )
-
-    # chain_with_source = RunnableParallel(
-    #     {"context": retriever, "question": RunnablePassthrough()}
-    # ).assign(answer=chain_from_docs)
-
-
-    # chain = (
-    #     {"context": vectorstore.as_retriever(search_kwargs={"k": 4}) | format_docs, "question": RunnablePassthrough()}
-    #     | prompt
-    #     | llm
-    #     | StrOutputParser()
-    # )
-
-    # chain = RetrievalQA.from_chain_type(
-    #     llm=llm,
-    #     chain_type="stuff",
-    #     retriever=vectorstore.as_retriever(search_kwargs={"k": 1}),
-    #     chain_type_kwargs={"prompt": prompt},
-    #     return_source_documents=True,
-    # )
-
-    # return chain_with_source
-
-    # The following code can be used to test the chain, however the chain object will be returned and used elsewhere.
-    
-    # query = "What is the purpose of security awareness?"
-
-    # test_output = chain.run({"query": query})
-
-    # print(test_output)

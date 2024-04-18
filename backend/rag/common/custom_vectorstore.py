@@ -1,8 +1,8 @@
 from langchain_community.vectorstores import Pinecone
 from typing import List, Tuple, Optional
 from langchain.docstore.document import Document
-from .fetch_keys import fetch_pinecone_key
 from pinecone import Pinecone as PineconeClient
+from .fetch_keys import fetch_key
 
 class CustomPineconeVectorstore(Pinecone):
     """
@@ -45,7 +45,7 @@ def load_existing_index(index_name: str):
     The index name is passed as an argument.
     """
 
-    pinecone_api_key = fetch_pinecone_key()
+    pinecone_api_key = fetch_key(secret_name="rag/PineconeKey", key_name="PINECONE_API_KEY")
     pinecone = PineconeClient(api_key=pinecone_api_key)
 
     pinecone_index_names = [index["name"] for index in pinecone.list_indexes()]

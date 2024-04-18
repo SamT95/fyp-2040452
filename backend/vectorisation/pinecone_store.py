@@ -88,12 +88,10 @@ def load_pinecone_index(index_name: str):
     """
     pinecone_api_key = fetch_pinecone_key()
     pinecone = PineconeClient(api_key=pinecone_api_key)
-    try:
-        index_description = pinecone.describe_index(index_name)
-        print(f"Index {index_name} exists. Loading...")
-        index = pinecone.Index(index_name)
-    except Exception as e:
-        print(f"Index {index_name} does not exist. Error: {e}")
-        print(f"Creating index {index_name}")
+    if index_name not in pinecone.list_indexes():
+        print(f"Index {index_name} does not exist. Creating...")
         index = create_pinecone_index(index_name, 1024)
+    else:
+        print(f"Loading index {index_name}")
+        index = pinecone.Index(index_name)
     return index

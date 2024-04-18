@@ -27,7 +27,7 @@ class ContentHandler(LLMContentHandler):
         return input_string.encode('utf-8')
     
     def transform_output(self, output: bytes) -> str:
-        response_json = json.loads(output.read().decode('utf-8'))
+        response_json = json.loads(output.decode('utf-8'))
         answer_split = response_json[0]['generated_text'].split('[/INST] ')
         return answer_split[1]
 
