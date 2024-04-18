@@ -6,18 +6,23 @@
     /* align-items: center; */
 }
 
-.introInfo p, .introTryIt p {
+.introInfo p, .introSources p {
     padding: 0.5em 0em;
 }
 
 .introHeader {
     font-size: 2em;
     font-weight: bold;
-    padding: 0.5em 0em;
+    padding: 0.5em 0em 0em 0em;
+    border-bottom: 3px solid #a18cd1;
 }
 
 .checkIcon {
     fill: green;
+}
+
+.banIcon {
+    fill: red;
 }
 
 .useCases {
@@ -36,6 +41,16 @@
 
 .disclaimer {
     font-size: 0.8em;
-    color: grey;
     padding: 0.5em 0em;
+    font-style: italic;
+}
+
+.sourcesList {
+    list-style-position: inside;
+}
+
+.sourcesList li:hover {
+    cursor: pointer;
+    color: #405cf5;
+    text-decoration: underline;
 }
