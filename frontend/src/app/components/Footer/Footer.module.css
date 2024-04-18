@@ -1,0 +1,27 @@
+.footer {
+    background-color: #333;
+    color: #fff;
+    padding: 0.5em;
+    /* position: fixed; */
+    left: 0;
+    bottom: 0;
+    width: 100%;
+}
+
+.footerContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333;
+    color: #fff;
+    padding: 0.5em;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+}
+
+.githubLink {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.4em;
+}
