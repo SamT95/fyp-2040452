@@ -3,6 +3,7 @@ from sagemaker.serverless import ServerlessInferenceConfig
 import json
 import sys # For sys.stdout during GitHub Actions
 import logging
+import os
 
 logging.getLogger("sagemaker").setLevel(logging.WARNING)
 # Silence 'INFO' logging from huggingface_model.deploy()
@@ -22,7 +23,8 @@ def deploy_language_model(role):
 
     hub = {
         "HF_MODEL_ID": "mistralai/Mistral-7B-Instruct-v0.1",
-        "SM_NUM_GPUS": json.dumps(1),      
+        "SM_NUM_GPUS": json.dumps(1),
+        "HUGGING_FACE_HUB_TOKEN": os.environ.get("HUGGING_FACE_HUB_TOKEN"), 
     }
     
     huggingface_model = HuggingFaceModel(
