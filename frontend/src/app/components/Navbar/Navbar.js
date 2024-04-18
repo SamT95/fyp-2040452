@@ -1,13 +1,15 @@
 import styles from "./Navbar.module.css";
-import DeploymentStatus from "@/app/components/DeploymentStatus/DeploymentStatus";
+import Link from "next/link";
+import HistoryPopover from "@/app/components/HistoryPopover/HistoryPopover";
 
 export default function Navbar() {
     return (
-        <nav className={styles.navbar} id="navbar">
+        <nav className={styles.navbar} role="navigation" id="navbar">
             <div className={styles.navbarContainer}>
-                <h1 className={styles.navbarTitle}>UP2020452 FYP</h1>
-                <h1 className={styles.navbarTitle}>Cyber Security Chatbot</h1>
-                <DeploymentStatus />
+                <h1 className={styles.navbarTitle}>
+                    <Link href="/">Home</Link>
+                </h1>
+                <HistoryPopover />
             </div>
         </nav>
     );
