@@ -56,15 +56,19 @@ class FrontendStack(Stack):
             service=ec2.GatewayVpcEndpointAwsService.S3,
         )
 
-        # Referemce Route53 hosted zone
-        my_hosted_zone = route53.HostedZone.from_lookup(self, "MyHostedZone",
+        # Reference Route53 hosted zone
+        my_hosted_zone = route53.HostedZone.from_lookup(
+            self, "MyHostedZone",
             domain_name="up2040452-fyp.com"
         )
 
         # Create a certificate for the domain
-        certificate = acm.Certificate(self, "SiteCertificate",
+        certificate = acm.Certificate(
+            self, "SiteCertificate",
             domain_name="up2040452-fyp.com",
-            validation=acm.CertificateValidation.from_dns(my_hosted_zone)
+            validation=acm.CertificateValidation.from_dns(
+                my_hosted_zone
+            )
         )
 
         # Create ECS cluster
@@ -107,10 +111,28 @@ class FrontendStack(Stack):
         # Pull image tag from context
         image_tag = self.node.try_get_context("imageTag")
 
-        # Pull API URL from SSM
-        chain_api_url = ssm.StringParameter.from_string_parameter_name(
+        # Pull QA Chain API URL from SSM
+        rag_chain_api_url = ssm.StringParameter.from_string_parameter_name(
             self, "ChainAPIURL",
             string_parameter_name="rag-chain-api-url"
+        ).string_value
+
+        # Pull Chat history API URL from SSM
+        chat_history_api_url = ssm.StringParameter.from_string_parameter_name(
+            self, "ChatHistoryAPIURL",
+            string_parameter_name="chat-history-api-url"
+        ).string_value
+
+        # Pull Cognito User Pool ID from SSM
+        cognito_user_pool_id = ssm.StringParameter.from_string_parameter_name(
+            self, "CognitoUserPoolID",
+            string_parameter_name="user-pool-id"
+        ).string_value
+
+        # Pull Cognito User Pool Client ID from SSM
+        cognito_user_pool_client_id = ssm.StringParameter.from_string_parameter_name(
+            self, "CognitoUserPoolClientID",
+            string_parameter_name="user-pool-client-id"
         ).string_value
 
         # Create log group for ECS task
@@ -132,7 +154,10 @@ class FrontendStack(Stack):
             memory_limit_mib=512,
             port_mappings=[ecs.PortMapping(container_port=3000)],
             environment={
-                "CHAIN_API_URL": chain_api_url
+                "CHAIN_API_URL": rag_chain_api_url,
+                "HISTORY_API_URL": chat_history_api_url,
+                "COGNITO_USER_POOL_ID": cognito_user_pool_id,
+                "COGNITO_APP_CLIENT_ID": cognito_user_pool_client_id
             },
             logging=ecs.LogDrivers.aws_logs(
                 stream_prefix="frontend",
@@ -141,7 +166,8 @@ class FrontendStack(Stack):
         )
 
         # Create Fargate service
-        load_balanced_fargate_service = patterns.ApplicationLoadBalancedFargateService(
+        load_balanced_fargate_service = (
+            patterns.ApplicationLoadBalancedFargateService(
             self, "Service",
             cluster=ecs_cluster,
             assign_public_ip=True,
@@ -153,7 +179,7 @@ class FrontendStack(Stack):
             certificate=certificate,
             domain_name="up2040452-fyp.com",
             domain_zone=my_hosted_zone,
-        )
+        ))
 
         alb_target_group = load_balanced_fargate_service.target_group
         alb_target_group.configure_health_check(
