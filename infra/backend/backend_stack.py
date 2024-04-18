@@ -35,6 +35,16 @@ class BackendStack(Stack):
             runtime=_lambda.Runtime.PYTHON_3_10,
         )
 
+        # Define policy statement to allow lambda to access S3 bucket
+        s3_policy = iam.PolicyStatement(
+            actions=["s3:*"],
+            effect=iam.Effect.ALLOW,
+            resources=[
+                "arn:aws:s3:::sagemaker-eu-west-1-349382198749",
+                "arn:aws:s3:::sagemaker-eu-west-1-349382198749/*"
+                ]
+        )
+
         # Define policy statement to allow lambda to access secrets manager
         secrets_manager_policy = iam.PolicyStatement(
             actions=["secretsmanager:GetSecretValue"],
@@ -47,16 +57,6 @@ class BackendStack(Stack):
             actions=["sagemaker:InvokeEndpoint"],
             effect=iam.Effect.ALLOW,
             resources=["arn:aws:sagemaker:*:*:endpoint/*"]
-        )
-
-        # Define policy statement to allow lambda to access S3 bucket
-        s3_policy = iam.PolicyStatement(
-            actions=["s3:*"],
-            effect=iam.Effect.ALLOW,
-            resources=[
-                "arn:aws:s3:::sagemaker-eu-west-1-349382198749",
-                "arn:aws:s3:::sagemaker-eu-west-1-349382198749/*"
-                ]
         )
 
         # Attach policy statements to RAG chain lambda role
@@ -74,7 +74,6 @@ class BackendStack(Stack):
             self, "QueryChainAPI",
             handler=self.qa_chain_lambda,
             proxy=False,
-            cloud_watch_role=True,
             deploy_options=apigw.StageOptions(
                 access_log_destination=apigw.LogGroupLogDestination(log_group),
                 access_log_format=apigw.AccessLogFormat.clf(),
@@ -89,13 +88,20 @@ class BackendStack(Stack):
             handler=self.chat_history_lambda,
             proxy=False,
         )
-        chat_history_resource = self.chat_history_api.root.add_resource("chat_history")
+        chat_history_resource = (
+        self.chat_history_api.root.add_resource("chat_history"))
         chat_history_resource.add_method("GET")
 
-        # Store API URL in SSM
+        # Store Query Chain API URL in SSM
         ssm.StringParameter(self, "QueryChainAPIURL",
             parameter_name="rag-chain-api-url",
             string_value=self.chain_api.url
+        )
+
+        # Store Chat History API URL in SSM
+        ssm.StringParameter(self, "ChatHistoryAPIURL",
+            parameter_name="chat-history-api-url",
+            string_value=self.chat_history_api.url
         )
 
         # Create DynamoDB table to store chat history
@@ -105,22 +111,33 @@ class BackendStack(Stack):
                 name="user_id",
                 type=dynamodb.AttributeType.STRING
             ),
+            # Composite sort key with conversation_id and timestamp
             sort_key=dynamodb.Attribute(
-                name="conversation_id_timestamp", # Composite sort key with conversation_id and timestamp
+                name="conversation_id_timestamp", 
                 type=dynamodb.AttributeType.STRING
             ),
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
         )
 
-        # Grant chat history lambda permission to read the chat history table
-        self.chat_history_table.grant_read_data(self.chat_history_lambda)
+        # Grant chat history lambda permission 
+        # to read the chat history table
+        self.chat_history_table.grant_read_data(
+            self.chat_history_lambda
+        )
 
-        # Grant rag chain lambda permission to read and write the chat history table
-        self.chat_history_table.grant_read_write_data(self.qa_chain_lambda)
+        # Grant rag chain lambda permission 
+        # to read and write the chat history table
+        self.chat_history_table.grant_read_write_data(
+            self.qa_chain_lambda
+        )
 
         # Add environment variables to the lambda functions
-        self.qa_chain_lambda.add_environment("TABLE_NAME", self.chat_history_table.table_name)
-        self.chat_history_lambda.add_environment("TABLE_NAME", self.chat_history_table.table_name)
+        self.qa_chain_lambda.add_environment(
+            "TABLE_NAME", self.chat_history_table.table_name
+        )
+        self.chat_history_lambda.add_environment(
+            "TABLE_NAME", self.chat_history_table.table_name
+        )
 
         # Create Cognito user pool for authentication
         self.user_pool = cognito.UserPool(
@@ -134,10 +151,14 @@ class BackendStack(Stack):
                 email=True
             ),
             standard_attributes=cognito.StandardAttributes(
-                email=cognito.StandardAttribute(required=True, mutable=True),
+                email=cognito.StandardAttribute(
+                    required=True, mutable=True
+                ),
             ),
             mfa=cognito.Mfa.OPTIONAL,
-            mfa_second_factor=cognito.MfaSecondFactor(otp=True, sms=False),
+            mfa_second_factor=cognito.MfaSecondFactor(
+                otp=True, sms=False
+            ),
             password_policy=cognito.PasswordPolicy(
                 min_length=8,
                 require_digits=True,
@@ -145,18 +166,32 @@ class BackendStack(Stack):
                 require_uppercase=True,
                 require_symbols=True,
             ),
-            account_recovery=cognito.AccountRecovery.EMAIL_ONLY,
+            account_recovery=(
+                cognito.AccountRecovery.EMAIL_ONLY
+            ),
         )
 
         # Create Cognito user pool client
         self.user_pool_client = self.user_pool.add_client(
             "UserPoolClient",
-            generate_secret=False, # Client secret is not needed for our use case
+            # Client secret unneeded for public
+            generate_secret=False,
             auth_flows=cognito.AuthFlow(
                 admin_user_password=True,
                 user_password=True,
                 user_srp=True
             ),
             prevent_user_existence_errors=True,
+        )
+
+        # Store user pool ID and client ID in SSM
+        ssm.StringParameter(self, "UserPoolID",
+            parameter_name="user-pool-id",
+            string_value=self.user_pool.user_pool_id
+        )
+
+        ssm.StringParameter(self, "UserPoolClientID",
+            parameter_name="user-pool-client-id",
+            string_value=self.user_pool_client.user_pool_client_id
         )
 
