@@ -1,5 +1,4 @@
 .botMessageContainer, .userMessageContainer {
-    width: max-content;
     max-width: 80%;
     clear: both;
     display: flex;
