@@ -1,0 +1,49 @@
+/* Aligns the form in the center of the page */
+.formContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column; /* Align items vertically */
+    height: 10%;
+}
+  
+  /* Styles for the form to align items horizontally */
+.form {
+    display: flex;
+    position: relative;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+}
+  
+.textarea {
+    width: 100%;
+    background-color: #e8f0fe; /* Light blue background */
+    padding-right: 4em; /* Space for the button */
+    padding: 1em;
+    border: none;
+    resize: none; /* Optional: Prevents resizing */
+}
+
+.textarea:focus {
+    outline: none;
+}
+
+.button {
+    position: absolute;
+    right: 10px; /* Align the button to the right */
+    top: 10px; /* Align the button to the bottom of the textarea */
+    border: none;
+    cursor: pointer;
+    border-radius: 20px;
+    padding: 1em 2em;
+    /* background-color: #405cf5; */
+    background-color: #0a26c2;
+    color: white;
+    /* box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px; */
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    transition: all 0.2s ease-in-out;
+}
+
+.button:hover {
+    transform: scale(1.02);
+}
