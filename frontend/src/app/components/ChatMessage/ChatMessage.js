@@ -2,20 +2,18 @@ import styles from "./ChatMessage.module.css";
 import { BsRobot } from "react-icons/bs";
 import { FaRegUser } from "react-icons/fa";
 
-
-
 export default function ChatMessage({ message }) {
     return (
-        <div aria-live="polite" className={message.sender === "bot" ? styles.botMessageContainer : styles.userMessageContainer}>
-            {message.sender === "bot" ? <div className={styles.botIcon}><BsRobot /></div> : null }
+        <div aria-live="polite" aria-label="Chat message" className={message.sender === "bot" ? styles.botMessageContainer : styles.userMessageContainer}>
+            {message.sender === "bot" ? <div className={styles.botIcon}><BsRobot aria-label="Bot icon" role="img" /></div> : null }
             <div className={message.sender === "bot" ? styles.botMessage : styles.userMessage}>
                 <p>
                     {message.message}
                 </p>
                 {message.sources && (
                 <div className={styles.sourceContainer}>
-                    <h4>Sources:</h4>
-                    <ul className={styles.sourceList}>
+                    <h4 id="sourceHeading">Sources:</h4>
+                    <ul aria-labelledby="sourceHeading" className={styles.sourceList}>
                         {message.sources.map((source, index) => (
                             <li key={index} className={styles.sourceItem}>
                                 <a className={styles.sourceLink} 
@@ -28,7 +26,7 @@ export default function ChatMessage({ message }) {
                 </div>
             )}
             </div>
-            {message.sender === "user" ? <div className={styles.userIcon}><FaRegUser /></div> : null }
+            {message.sender === "user" ? <div className={styles.userIcon}><FaRegUser aria-label="User icon" role="img"/></div> : null }
         </div>
     )
 }

@@ -1,14 +1,11 @@
 .conversationContainer {
     width: 100%; /* Match the form's width */
     background-color: #e8f0fe; /* Light blue background for the conversation area */
-    margin-bottom: 20px; /* Space between the conversation area and the form */
+    border-bottom: 2px solid black;
     padding: 1em;
     overflow-y: auto; /* Allow scrolling for overflow */
-    max-height: 700px; /* Maximum height before scrolling */
-    min-height: 700px;
-    /* border-top: 3px solid #d52b1e;  */
-    border-radius: 4px;
-    /* box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px; */
+    max-height: 90%; /* Maximum height before scrolling */
+    min-height: 90%;
     display: flex;
     justify-content: space-between;
     flex-direction: column;
@@ -26,4 +23,10 @@
 
 .clearFloat {
     clear: both; /* Clear the float after each messageContainer div */
+}
+
+@media only screen and (max-width: 600px) {
+    .conversationContainer {
+        height:  90%;
+    }
 }

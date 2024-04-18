@@ -1,0 +1,66 @@
+.historyContainer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 300px; /* Sidebar width */
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+    transition: width 0.3s ease-in-out;
+    z-index: 10;
+    padding: 1em;
+}
+
+.historyPanel {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.expanded {
+    transition: width 0.3s ease-in-out;
+}
+
+.collapsed {
+    width: 50px; /* Collapsed width */
+}
+
+.newChatButton {
+    padding: 0.5em;
+    background-color: #0a26c2; /* Dark blue color */
+    color: white;
+    border: none;
+    border-radius: 0.5em;
+    cursor: pointer;
+    width: 100%;
+    font-size: 1em;
+    margin-bottom: 1em;
+    transition: all 0.3s ease-in-out;
+    transform: translateZ(0); /* Prevent the button from flickering on hover */
+}
+
+.newChatButton:hover {
+    transform: scale3d(1.01, 1.01, 1); /* Prevent the button from flickering on hover */
+}
+
+.closeButton, .openButton {
+    border: none;
+    font-size: 1em;
+    background: none;
+    border-radius: 0.5em;
+    cursor: pointer;
+    align-self: flex-end;
+}
+
+.chatLink {
+    width: 100%;
+}
+
+.emptyHistory {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}

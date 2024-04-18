@@ -3,7 +3,6 @@ import useStore from "@/app/store/useStore";
 import styles from "./ChatContainer.module.css";
 import ChatMessage from "../ChatMessage/ChatMessage";
 import PromptHint from "../PromptHint/PromptHint";
-import { Prompt } from "next/font/google";
 import useChat from "@/app/hooks/useChat";
 
 export default function ChatContainer() {
@@ -20,7 +19,7 @@ export default function ChatContainer() {
     
     return (
         <>
-        <div className={styles.conversationContainer}>
+        <article className={styles.conversationContainer}>
             <div className={styles.messagesContainer}>
             {conversations.map((message) => {
                 return (
@@ -32,15 +31,14 @@ export default function ChatContainer() {
             })}
             </div>
             {conversations.length < 2 && (
-                <div className={styles.promptHints}>
+                <div role="group" id="PromptHints" className={styles.promptHints}>
                     <PromptHint handleSubmit={handleSubmit} prompt="What is phishing?" />
                     <PromptHint handleSubmit={handleSubmit} prompt="What is malware?" />
                     <PromptHint handleSubmit={handleSubmit} prompt="How can malware presence be identified?" />
                 </div>
             )}
-        </div>
+        </article>
         <div className={styles.clearFloat}></div>
-        </>
-        
+        </>   
     )
 }

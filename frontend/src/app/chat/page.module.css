@@ -1,0 +1,11 @@
+.pageContainer {
+    height: calc(100vh - 45px); /* Account for navbar height */
+    display: flex;
+    width: 100%;
+    flex-grow: 1;
+}
+
+.conversationContainer {
+    max-height: 100%;
+    flex-grow: 1;
+}
