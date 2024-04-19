@@ -4,10 +4,10 @@ import HistoryPanel from "@/app/components/HistoryPanel/HistoryPanel";
 
 async function fetchHistory() {
     const headersStore = headers();
-    // Get user_id and user_name from headers
+    // Get x-user-id and x-user-name from headers
     // (forwarded from the middleware.js file in the frontend/src directory)
-    const userId = headersStore.get("user_id");
-    const userName = headersStore.get("user_name");
+    const userId = headersStore.get("x-user-id");
+    const userName = headersStore.get("x-user-name");
     // If user_id or user_name is not present, return empty chat history
     if (!userId || !userName) {
         return {
