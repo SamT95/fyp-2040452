@@ -16,14 +16,6 @@ export default function Intro() {
             source: "Cyber Security Alerts & Advisories",
             link: "https://www.cisa.gov/news-events/cybersecurity-advisories"
         },
-        {
-            source: "Security blogs and news articles",
-            link: "https://www.zdnet.com/topic/security/"
-        },
-        {
-            source: "Security vendor advisories",
-            link: "https://www.cisco.com/c/en/us/support/security/index.html"
-        }
     ]
 
     const additionalSourcesAndLinks = [
@@ -71,7 +63,7 @@ export default function Intro() {
                         </li>
                     ))}
                 </ul>
-                <p>These sources provide context for the chatbot&apos;s answers, however they are not all-encompassing</p>
+                <p>These sources provide context for the chatbot&apos;s answers, however they are not all-encompassing.</p>
                 <p>Additional sources of information and guidance are outlined below:</p>
                 <ul role="list" className={styles.sourcesList}>
                     {additionalSourcesAndLinks.map((source, index) => (

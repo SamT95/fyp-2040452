@@ -13,8 +13,8 @@ export default function AuthTabs() {
 
     return (
         <div className={styles.pageContainer}>
-            <div role="tablist" className={styles.formContainer}>
-                <div className={styles.tabButtons}>
+            <div className={styles.formContainer}>
+                <div role="tablist" className={styles.tabButtons}>
                     <button 
                     onClick={() => handleTabChange("signin")}
                     role="tab"

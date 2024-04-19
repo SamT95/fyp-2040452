@@ -8,8 +8,8 @@ export function middleware(request) {
         const accessToken = request.cookies.get("access_token");
         const decodedToken = decode(accessToken.value); // Decode (add a check for expiration)
         const response = NextResponse.next();
-        response.headers.set("user_id", decodedToken.sub);
-        response.headers.set("user_name", decodedToken.username);
+        response.headers.set("x-user-id", decodedToken.sub);
+        response.headers.set("x-user-name", decodedToken.username);
         response.headers.set("x-url", request.url);
         return response;
     }

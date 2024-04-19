@@ -52,14 +52,14 @@ export default async function SignIn(prevState, formData) {
     if (actionOutcome.success) {
         // Set the cookies in the response headers if the user is signed in successfully
         // Expire tokens in 1 hour
-        const dateTest = new Date(Date.now() + actionOutcome.cookies.ExpiresIn * 1000);
+        const expiryDate = new Date(Date.now() + actionOutcome.cookies.ExpiresIn * 1000);
         cookies().set({
             name: "access_token",
             value: actionOutcome.cookies.AccessToken,
             httpOnly: true, // Set the httpOnly flag to true to prevent client-side JavaScript from accessing the cookie
             sameSite: "strict", // Set the SameSite flag to "strict" to prevent CSRF attacks
             secure: true, // Set the secure flag to true to ensure that the cookie is only sent over HTTPS
-            expires: dateTest, // Set the expiration time of the cookie
+            expires: expiryDate, // Set the expiration time of the cookie
         })
         redirect(actionOutcome.redirectTo);
     } else {
@@ -68,5 +68,4 @@ export default async function SignIn(prevState, formData) {
             message: actionOutcome.message
         }
     }
-
 }
