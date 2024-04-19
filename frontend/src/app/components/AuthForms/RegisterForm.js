@@ -43,7 +43,7 @@ export function RegisterForm({ onSuccess }) {
             <div className={styles.formButtons}>
                 <Button type="submit" variant="primary" form>Register account</Button>
             </div>
-            <p className={state.success ? styles.formSuccess : styles.formError} aria-live="polite">
+            <p aria-label="Form status" className={state.success ? styles.formSuccess : styles.formError} aria-live="polite">
                 {state.message}
             </p>
         </form>
@@ -72,7 +72,7 @@ export function VerificationForm() {
             <div className={styles.formButtons}>
                 <Button aria-label="Submit" type="submit" variant="primary" form>Verify</Button>
             </div>
-            <p className={state.success ? styles.formSuccess : styles.formError} aria-live="polite">
+            <p aria-label="Form status" className={state.success ? styles.formSuccess : styles.formError} aria-live="polite">
                 {state.message}
             </p>
         </form>
