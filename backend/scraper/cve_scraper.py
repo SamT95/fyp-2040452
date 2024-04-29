@@ -30,7 +30,6 @@ class CveScraper(BaseScraper):
         Returns:
         zipfile.ZipFile: The filestream of the zip file.
         """
-        print(f"Zip URL: {zip_url}")
         zip_response = requests.get(zip_url)
         zip_response.raise_for_status()
         zip_bytes = io.BytesIO(zip_response.content)
@@ -40,7 +39,6 @@ class CveScraper(BaseScraper):
         json_data = []
         with zipfile.ZipFile(zip_bytes, "r") as zip_ref:
            for zip_info in zip_ref.infolist():
-               print(zip_info.filename)
                if zip_info.filename.endswith(".json"):
                    with zip_ref.open(zip_info.filename) as json_file:
                         # Decode file bytes to string
