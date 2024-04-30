@@ -25,13 +25,6 @@
     width: 100%;
 }
 
-.forgotPassword {
-    text-align: right;
-    font-size: 0.8em;
-    color: #575757;
-}
-
-
 .authForm input {
     padding: 0.5em;
     border: none;

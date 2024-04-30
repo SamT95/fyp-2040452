@@ -6,8 +6,12 @@ This repository stores the code utilised in my final year project. This is a mon
 - [Frontend](#frontend)
     - [Server-side Frontend Actions](#server-side-frontend-actions)
     - [Server-side API Route Handlers](#server-side-api-route-handlers)
-    - [Unit Tests](#unit-tests)
+    - [Frontend Unit Tests](#frontend-unit-tests)
 - [Backend](#backend)
+    - [Retrieval-Augmented Generation Chain](#retrieval-augmented-generation-chain)
+    - [Data Fetching and Ingestion](#data-fetching-and-ingestion)
+    - [Automated Data Fetching](#automated-data-fetching)
+    - [Backend Unit Tests](#backend-unit-tests)
 - [Deployment](#deployment)
     - [Lambda Deployment Package](#lambda-deployment-package)
     - [AWS CDK](#aws-cdk)
@@ -24,7 +28,7 @@ Next.js provides a feature called [server actions](https://nextjs.org/docs/app/b
 ### Server-side API Route Handlers
 Next.js also provides a feature called [API routes](https://nextjs.org/docs/api-routes/introduction) that allows you to create server-side endpoints that can be called from the frontend. This was utilised when interacting with the backend API Gateway endpoints. The API route handlers are defined in the `frontend/src/app/api/` directory.
 
-### Unit Tests
+### Frontend Unit Tests
 Unit tests for the frontend components are written using [Jest](https://jestjs.io/) and [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/). The tests are defined in the `frontend/src/app//__tests__/` directory. The [Mock Service Worker](https://mswjs.io/) library is utilised to mock the API requests made by the frontend components. MSW mocks can be found in the `frontend/src/mocks/` directory. The tests can be run using the `npm run test` command. The Jest configuration can be found in the `frontend/jest.config.js` file, alongside helper files like `jest.polyfills.js` and `jest.setup.js`. 
 
 ## Backend
@@ -51,6 +55,9 @@ The sources of data are defined below:
 
 ### Automated Data Fetching
 The backend code is responsible for automatically fetching and ingesting data from the sources mentioned above. The data fetching and ingestion components are defined in the `backend/scraper/` and `backend/vectorisation/` directories. The `backend/scraper_coordinator.py` file coordinates the fetching and ingestion of data from various sources. The `backend/scraper_coordinator.py` file is run every 24 hours using a scheduled [GitHub Actions](https://docs.github.com/en/actions) workflow. The workflow can be found in the `.github/workflows/scheduled_data_fetching.yml` file.
+
+### Backend Unit Tests
+Backend unit tests are written using the [unittest](https://docs.python.org/3/library/unittest.html) library. The tests are defined in the `backend/tests/` directory. The tests can be run using the `python -m unittest` command. The [unittest.mock](https://docs.python.org/3/library/unittest.mock.html) library is utilised to mock the dependencies of the backend components.
 
 
 ## Deployment
