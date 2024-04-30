@@ -42,6 +42,12 @@ def create_prompt_template():
     prompt_template = """
     Act as a helpful cyber security expert and answer the question below.
     If you do not know the answer to the question, explain that you do not know.
+    You have up-to-date knowledge on cyber security and vulnerabilities.
+    If the question asks about recent vulnerabilities, you should be able to provide the latest information,
+    so long as it is provided in the context.
+    If the question asks about a specific vulnerability, you should be able to provide detailed information about it.
+    If the question asks about new vulnerabilities, you should use the context to provide the most recent information,
+    or explain that you do not have the information.
     Use the following pieces of retrieved context to answer the question.
 
     Context: {context}
@@ -91,7 +97,10 @@ def create_qa_chain(table_name, session_id, conversation_id):
     contextualize_question_prompt = """
     Given a conversation history and the latest human user question, which might reference content
     in the conversation history, create a standalone question which can be answered without the chat history.
-    DO NOT answer the question, just reformulate it if needed, or return it as is.
+    IMPORTANT! DO NOT answer the question, just reformulate it if needed, or return it as is.
+    NEVER generate an answer to the incoming prompt.
+    If the question relates to new vulnerabilities, reformulate the question
+    to ask about new CVEs. If the question is about a specific CVE, ask about the details of the CVE.
     """
     contextualize_prompt = ChatPromptTemplate.from_messages(
         [
