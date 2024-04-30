@@ -1,5 +1,5 @@
 from backend.scraper.cybok_scraper import CybokScraper
-# from backend.scraper.cisa_scraper import CisaScraper
+from backend.scraper.cisa_scraper import CisaScraper
 from backend.scraper.cve_scraper import CveScraper
 from vectorisation.cohere_embeddings import batch_embeddings
 from vectorisation.pinecone_store import load_pinecone_index
@@ -12,7 +12,7 @@ def fetch_all_content(selected_scrapers):
     scraper_to_adapter_map = {
         "cybok": (CybokScraper(), adapt_cybok_data),
         "cve": (CveScraper(), adapt_cve_data),
-        # "cisa": (CisaScraper(), adapt_cisa_data)
+        "cisa": (CisaScraper(), adapt_cisa_data)
     }
 
     all_content = []
@@ -71,6 +71,24 @@ def adapt_cybok_data(cybok_data):
             })
     return adapted_data
 
+def adapt_cisa_data(cisa_data):
+    adapted_data = []
+    for item in cisa_data:
+        # Combine the title and text into a single text for embedding
+        # This ensures the title is included in the embedding,
+        # which is useful for similarity search
+        text_chunks = chunk_text(item["text"], item["title"], chunk_size=512)
+        for chunk in text_chunks:
+            adapted_data.append({
+                "text": chunk,
+                "metadata": {
+                    "source": item["source"],
+                    "title": item["title"],
+                }
+            })
+    return adapted_data
+
+
 def adapt_cve_data(cve_data):
     adapted_data = []
     for item in cve_data:
@@ -103,6 +121,14 @@ def batch_upsert_to_pinecone(index, embeddings, all_content, batch_size=12):
     Returns:
     None
     """
+
+    # pull out 'embeddings' item from embeddings response        
+    new_embeddings = []
+    for item in embeddings:
+        if item[0] == 'embeddings':
+            new_embeddings.append(item[1])
+    embeddings = new_embeddings[0]
+
     for i in range(0, len(embeddings), batch_size):
         batch_embeddings = embeddings[i:i+batch_size]
         batch_chunks = all_content[i:i+batch_size]
