@@ -26,7 +26,6 @@ export default function SignInTab() {
                     <FaLock />
                     <input aria-label="Password" type="password" id="password" name="password" placeholder="Password" />
                 </div>
-                <span className={styles.forgotPassword}>Forgot password?</span>
             </div>
             <div className={styles.formButtons}>
                 <Button aria-label="Submit" type="submit" variant="primary" form>Sign in</Button>
