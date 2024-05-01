@@ -1,8 +1,13 @@
 # UP2040452 Final Year Project
 
-This repository stores the code utilised in my final year project. This is a monorepo containing backend, frontend and infrastructure code.
+This repository stores the code utilised in my retrieval-augmented generation-based final year project. This is a monorepo containing backend, frontend and infrastructure code.
+
+The deployed site can be found at [https://up2040452-fyp.com](https://up2040452-fyp.com).
 
 ## Table of Contents
+- [GitHub Actions](#github-actions)
+- [What is it?](#what-is-it)
+- [Data Sources](#data-sources)
 - [Frontend](#frontend)
     - [Server-side Frontend Actions](#server-side-frontend-actions)
     - [Server-side API Route Handlers](#server-side-api-route-handlers)
@@ -16,6 +21,21 @@ This repository stores the code utilised in my final year project. This is a mon
     - [Lambda Deployment Package](#lambda-deployment-package)
     - [AWS CDK](#aws-cdk)
     - [User Authentication](#user-authentication)
+
+## What is it?
+The project is a retrieval-augmented generation-based chatbot that provides cyber security information and guidance. The chatbot is designed to assist users in finding relevant cyber security information by generating responses based on user queries and data retrieved from a [Pinecone](https://pinecone.io) vector store. The chatbot is built using a retrieval-augmented generation chain that combines a retrieval model with a generation model. The retrieval model retrieves relevant information from the Pinecone vector store while the generation model generates a response based on the retrieved information and the user query. The chatbot is deployed as a web application that allows users to interact with the chatbot through a user-friendly interface.
+
+## Data Sources
+The chatbot retrieves and references data from only three sources. These sources are:
+
+- [CyBOK](https://www.cybok.org/) - The Cybersecurity Body of Knowledge (CyBOK) is a comprehensive body of knowledge that focuses on cyber security. The combined CyBOK PDF is fetched and processed before being embedded and stored. The code for the CyBOK data scraper can be found in `backend/scraper/cybok_scraper.py`.
+- [CVE Database](https://cve.mitre.org/) - The Common Vulnerabilities and Exposures (CVE) database is a publicly available list of common vulnerabilities and exposures. The [CVElist GitHub Repository](https://github.com/CVEProject/cvelistV5). The repository publishes scheduled JSON files containing new and updated CVEs. The updated CVE file is fetched and processed before being embedded and stored. The CVE data is fetched every 24 hours. The code for the CVE data scraper can be found in `backend/scraper/cve_scraper.py`. The workflow responsible for fetching the CVE data can be found in `.github/workflows/scheduled_data_fetching.yml`.
+- [CISA Alerts](https://www.cisa.gov/news-events/cybersecurity-advisories) - The Cybersecurity and Infrastructure Security Agency (CISA) publishes alerts on their website. The alerts are fetched and processed before being embedded and stored. The code for the CISA alerts data scraper can be found in `backend/scraper/cisa_scraper.py`.
+
+## GitHub Actions
+The project utilises [GitHub Actions](https://docs.github.com/en/actions) for continuous integration and deployment. The workflows can be found in the `.github/workflows/` directory. The workflows are triggered on pushes to the `main` branch.
+
+Workflows are created for things like deploying the frontend CDK stack, deploying the CDK stack, automated data fetching and ingesting, and for deploying the Mistral-7B-Instruct-v0.1 LLM to SageMaker.
 
 ## Frontend
 The `frontend/` folder contains the source code of the frontend utilised in the project. The frontend was created using [Next.js](https://nextjs.org/) and [React](https://react.dev/).
