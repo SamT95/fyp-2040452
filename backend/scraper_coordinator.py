@@ -122,6 +122,12 @@ def batch_upsert_to_pinecone(index, embeddings, all_content, batch_size=12):
     None
     """
 
+    new_embeddings = []
+    for item in embeddings:
+        if item[0] == 'embeddings':
+            new_embeddings.append(item[1])
+    embeddings = new_embeddings[0]
+
     for i in range(0, len(embeddings), batch_size):
         batch_embeddings = embeddings[i:i+batch_size]
         batch_chunks = all_content[i:i+batch_size]
